@@ -44,18 +44,18 @@
 │ │ └─ DependencyInjection.cs
 │ │
 │ └─ CleanHospital.WebApi
-│ ├─ Program.cs
-│ ├─ appsettings.json
-│ ├─ appsettings.Development.json
-│ └─ Controllers
-│   └─ PatientsController.cs
+│   ├─ Program.cs
+│   ├─ appsettings.json
+│   ├─ appsettings.Development.json
+│   └─ Controllers
+│     └─ PatientsController.cs
 │
 ├─ tests
 │ └─ CleanHospital.Tests
-│ ├─ Domain
-│ │ └─ PatientTests.cs
-│ └─ Application
-│   └─ CreatePatientHandlerTests.cs
+│   ├─ Domain
+│   │ └─ PatientTests.cs
+│   └─ Application
+│     └─ CreatePatientHandlerTests.cs
 │
 ├─ .editorconfig
 ├─ .gitignore

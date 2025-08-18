@@ -1,8 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using Template.API.Extensions;
 using Template.Application;
 using Template.Infrastructure;
-using Template.API.Extensions;
 using Template.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Template.API
 {
@@ -12,38 +12,25 @@ namespace Template.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
-
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowSpecificOrigins", policy =>
-                {
-                    if (allowedOrigins != null && allowedOrigins.Length > 0)
-                    {
-                        policy.WithOrigins(allowedOrigins)
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    }
-                    else
-                    {
-                        policy.AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    }
-                });
-            });
-
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
-            builder.Services.AddWebApiServices();
+            builder.Services.AddWebApiServices(builder.Configuration);
 
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                dbContext.Database.Migrate();
-                //DbSeeder.Seed(dbContext);
+                var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+                try
+                {
+                    dbContext.Database.Migrate();
+                    //IdentityDbSeeder.Seed(dbContext, scope.ServiceProvider).GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Database migration failed: {ex.Message}");
+                    throw;
+                }
             }
 
             if (app.Environment.IsDevelopment())
@@ -53,11 +40,11 @@ namespace Template.API
             }
 
             app.UseHttpsRedirection();
+            
+            app.UseExceptionHandler("/error");
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseCors("AllowSpecificOrigins");
 
             app.MapControllers();
 

@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Template.Infrastructure.Persistence;
 using Template.Domain.Identity;
+using Template.Infrastructure.Persistence;
 
 namespace Template.Infrastructure
 {
@@ -13,15 +14,19 @@ namespace Template.Infrastructure
             IConfiguration configuration)
         {
             // User/Identity DB
-            services.AddDbContext<UserDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("UserConnection")));
+            services.AddDbContext<IdentityDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("IdentityConnection")));
 
-            services.AddIdentityCore<ApplicationUser>()
-                .AddEntityFrameworkStores<UserDbContext>();
-
-            // Business DB
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("BusinessConnection")));
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.User.RequireUniqueEmail = false;
+                options.SignIn.RequireConfirmedEmail = false;
+            })
+            .AddEntityFrameworkStores<IdentityDbContext>()
+            .AddDefaultTokenProviders();
 
             return services;
         }
