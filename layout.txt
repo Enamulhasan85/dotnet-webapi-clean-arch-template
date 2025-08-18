@@ -1,0 +1,63 @@
+﻿CleanHospital
+├─ src
+│ ├─ CleanHospital.Domain
+│ │ ├─ Common
+│ │ │ ├─ Entity.cs
+│ │ │ └─ ValueObject.cs
+│ │ ├─ Entities
+│ │ │ ├─ Patient.cs
+│ │ │ ├─ Doctor.cs
+│ │ │ ├─ Prescription.cs
+│ │ │ └─ PrescriptionItem.cs
+│ │ ├─ ValueObjects
+│ │ │ └─ Address.cs
+│ │ └─ Abstractions
+│ │   ├─ IPatientRepository.cs
+│ │   └─ IUnitOfWork.cs
+│ │
+│ ├─ CleanHospital.Application
+│ │ ├─ Abstractions
+│ │ │ └─ IDateTime.cs
+│ │ ├─ Patients
+│ │ │ ├─ Commands
+│ │ │ │ ├─ CreatePatient
+│ │ │ │ │ ├─ CreatePatientCommand.cs
+│ │ │ │ │ ├─ CreatePatientCommandValidator.cs
+│ │ │ │ │ └─ CreatePatientCommandHandler.cs
+│ │ │ └─ Queries
+│ │ │ └─ GetPatientById
+│ │ │ ├─ GetPatientByIdQuery.cs
+│ │ │ └─ GetPatientByIdQueryHandler.cs
+│ │ └─ Mapping
+│ │   └─ MappingProfile.cs
+│ │
+│ ├─ CleanHospital.Infrastructure
+│ │ ├─ Persistence
+│ │ │ ├─ AppDbContext.cs
+│ │ │ ├─ Configurations
+│ │ │ │ ├─ PatientConfiguration.cs
+│ │ │ │ ├─ DoctorConfiguration.cs
+│ │ │ │ └─ PrescriptionConfiguration.cs
+│ │ │ └─ UnitOfWork.cs
+│ │ ├─ Repositories
+│ │ │ └─ PatientRepository.cs
+│ │ └─ DependencyInjection.cs
+│ │
+│ └─ CleanHospital.WebApi
+│ ├─ Program.cs
+│ ├─ appsettings.json
+│ ├─ appsettings.Development.json
+│ └─ Controllers
+│   └─ PatientsController.cs
+│
+├─ tests
+│ └─ CleanHospital.Tests
+│ ├─ Domain
+│ │ └─ PatientTests.cs
+│ └─ Application
+│   └─ CreatePatientHandlerTests.cs
+│
+├─ .editorconfig
+├─ .gitignore
+├─ docker-compose.yml
+└─ src/CleanHospital.WebApi/Dockerfile
