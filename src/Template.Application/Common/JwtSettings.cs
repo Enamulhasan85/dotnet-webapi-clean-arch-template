@@ -1,4 +1,4 @@
-﻿namespace Template.Application.Common.Settings
+﻿namespace Template.Application.Common
 {
     public class JwtSettings
     {

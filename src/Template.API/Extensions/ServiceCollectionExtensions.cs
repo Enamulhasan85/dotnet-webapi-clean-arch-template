@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Template.Application.Settings;
+using Template.Application.Common;
 
 namespace Template.API.Extensions
 {
@@ -43,6 +43,9 @@ namespace Template.API.Extensions
             services.AddSwaggerGen();
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+            // Register custom services
+            services.AddScoped<Template.API.Services.IValidationService, Template.API.Services.ValidationService>();
 
             services.AddCors(options =>
             {
