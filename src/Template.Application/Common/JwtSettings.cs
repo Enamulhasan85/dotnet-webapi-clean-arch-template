@@ -1,10 +1,10 @@
-﻿namespace Template.Application.Settings
+﻿namespace Template.Application.Common.Settings
 {
     public class JwtSettings
     {
-        public required string Secret { get; set; }
-        public required string Issuer { get; set; }
-        public required string Audience { get; set; }
-        public int ExpiryMinutes { get; set; }
+        public string Secret { get; set; } = string.Empty;
+        public string Issuer { get; set; } = string.Empty;
+        public string Audience { get; set; } = string.Empty;
+        public int ExpiryMinutes { get; set; } = 60;
     }
 }
