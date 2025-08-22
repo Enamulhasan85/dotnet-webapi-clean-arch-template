@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Template.Application.Services;
 
 namespace Template.Application
 {
@@ -10,6 +11,9 @@ namespace Template.Application
             // Example: MediatR, AutoMapper, Validators, etc.
             // services.AddMediatR(typeof(DependencyInjection).Assembly);
             // services.AddAutoMapper(typeof(DependencyInjection).Assembly);
+
+            // Register domain services
+            services.AddScoped<DemoService>();
 
             return services;
         }

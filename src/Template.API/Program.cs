@@ -20,15 +20,28 @@ namespace Template.API
 
             using (var scope = app.Services.CreateScope())
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+                // Migrate IdentityDbContext
+                var identityDbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
                 try
                 {
-                    dbContext.Database.Migrate();
-                    //IdentityDbSeeder.Seed(dbContext, scope.ServiceProvider).GetAwaiter().GetResult();
+                    identityDbContext.Database.Migrate();
+                    //IdentityDbSeeder.Seed(identityDbContext, scope.ServiceProvider).GetAwaiter().GetResult();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Database migration failed: {ex.Message}");
+                    Console.WriteLine($"Identity database migration failed: {ex.Message}");
+                    throw;
+                }
+
+                // Migrate AppDbContext
+                var appDbContext = scope.ServiceProvider.GetRequiredService<Template.Infrastructure.Persistence.AppDbContext>();
+                try
+                {
+                    appDbContext.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"App database migration failed: {ex.Message}");
                     throw;
                 }
             }

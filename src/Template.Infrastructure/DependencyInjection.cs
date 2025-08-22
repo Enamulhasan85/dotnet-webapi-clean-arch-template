@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Template.Application.Abstractions;
 using Template.Domain.Identity;
 using Template.Infrastructure.Auth;
 using Template.Infrastructure.Persistence;
+using Template.Infrastructure.Repositories;
 
 namespace Template.Infrastructure
 {
@@ -17,6 +19,10 @@ namespace Template.Infrastructure
             // User/Identity DB
             services.AddDbContext<IdentityDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("IdentityConnection")));
+
+            // AppDbContext for domain entities
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -42,6 +48,12 @@ namespace Template.Infrastructure
             })
             .AddEntityFrameworkStores<IdentityDbContext>()
             .AddDefaultTokenProviders();
+
+
+            // Register repositories and UnitOfWork
+            services.AddScoped<IPatientRepository, PatientRepository>();
+            services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<ITokenService, TokenService>();
 
