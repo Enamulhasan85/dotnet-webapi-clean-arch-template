@@ -53,6 +53,9 @@ namespace Template.Infrastructure
             .AddEntityFrameworkStores<IdentityDbContext>()
             .AddDefaultTokenProviders();
 
+            // Register common infrastructure services
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IDateTime, DateTimeService>();
 
             // Register repositories and UnitOfWork
             services.AddScoped<IPatientRepository, PatientRepository>();
