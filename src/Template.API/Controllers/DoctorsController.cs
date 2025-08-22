@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.API.Models;
-using Template.Application.Interfaces;
+using Template.Application.Common.Interfaces;
 
 namespace Template.API.Controllers
 {

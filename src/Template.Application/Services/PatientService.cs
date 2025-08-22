@@ -1,6 +1,6 @@
+using AutoMapper;
 using Template.Application.Common.Interfaces;
 using Template.Application.DTOs;
-using Template.Application.Interfaces;
 using Template.Domain.Entities;
 
 namespace Template.Application.Services
@@ -8,22 +8,19 @@ namespace Template.Application.Services
     public class PatientService : IPatientService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public PatientService(IUnitOfWork unitOfWork)
+        public PatientService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResult<PatientDto>> GetPatientsPaginatedAsync(int pageNumber, int pageSize)
         {
             var paginatedPatients = await _unitOfWork.Patients.GetPagedAsync(pageNumber, pageSize);
 
-            var patientDtos = paginatedPatients.Items.Select(p => new PatientDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                DateOfBirth = p.DateOfBirth
-            });
+            var patientDtos = _mapper.Map<IEnumerable<PatientDto>>(paginatedPatients.Items);
 
             return new PaginatedResult<PatientDto>(
                 patientDtos,
@@ -38,31 +35,17 @@ namespace Template.Application.Services
             if (patient == null)
                 return null;
 
-            return new PatientDto
-            {
-                Id = patient.Id,
-                Name = patient.Name,
-                DateOfBirth = patient.DateOfBirth
-            };
+            return _mapper.Map<PatientDto>(patient);
         }
 
         public async Task<PatientDto> CreatePatientAsync(CreatePatientDto createPatientDto)
         {
-            var patient = new Patient
-            {
-                Name = createPatientDto.Name,
-                DateOfBirth = createPatientDto.DateOfBirth
-            };
+            var patient = _mapper.Map<Patient>(createPatientDto);
 
             await _unitOfWork.Patients.AddAsync(patient);
             await _unitOfWork.CompleteAsync();
 
-            return new PatientDto
-            {
-                Id = patient.Id,
-                Name = patient.Name,
-                DateOfBirth = patient.DateOfBirth
-            };
+            return _mapper.Map<PatientDto>(patient);
         }
 
         public async Task<PatientDto?> UpdatePatientAsync(int id, UpdatePatientDto updatePatientDto)
@@ -71,18 +54,12 @@ namespace Template.Application.Services
             if (patient == null)
                 return null;
 
-            patient.Name = updatePatientDto.Name;
-            patient.DateOfBirth = updatePatientDto.DateOfBirth;
+            _mapper.Map(updatePatientDto, patient);
 
             _unitOfWork.Patients.Update(patient);
             await _unitOfWork.CompleteAsync();
 
-            return new PatientDto
-            {
-                Id = patient.Id,
-                Name = patient.Name,
-                DateOfBirth = patient.DateOfBirth
-            };
+            return _mapper.Map<PatientDto>(patient);
         }
 
         public async Task<bool> DeletePatientAsync(int id)

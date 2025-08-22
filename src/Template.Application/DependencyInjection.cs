@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Template.Application.Interfaces;
+﻿using System.Reflection;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
+using Template.Application.Common.Interfaces;
 using Template.Application.Services;
 
 namespace Template.Application
@@ -8,12 +10,13 @@ namespace Template.Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            // Register Application-layer services here
-            // Example: MediatR, AutoMapper, Validators, etc.
-            // services.AddMediatR(typeof(DependencyInjection).Assembly);
-            // services.AddAutoMapper(typeof(DependencyInjection).Assembly);
+            // Register AutoMapper
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-            // Register domain services
+            // Register FluentValidation
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+            // Register Application services
             services.AddScoped<DemoService>();
             services.AddScoped<IPatientService, PatientService>();
             services.AddScoped<IDoctorService, DoctorService>();

@@ -1,6 +1,6 @@
 using Template.Application.DTOs;
 
-namespace Template.Application.Interfaces
+namespace Template.Application.Common.Interfaces
 {
     public interface IDoctorService
     {

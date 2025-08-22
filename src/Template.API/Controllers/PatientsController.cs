@@ -1,7 +1,8 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.API.Models;
-using Template.Application.Interfaces;
+using Template.Application.Common.Interfaces;
 
 namespace Template.API.Controllers
 {
@@ -11,11 +12,13 @@ namespace Template.API.Controllers
     public class PatientsController : ControllerBase
     {
         private readonly IPatientService _patientService;
+        private readonly IMapper _mapper;
         private readonly ILogger<PatientsController> _logger;
 
-        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger)
+        public PatientsController(IPatientService patientService, IMapper mapper, ILogger<PatientsController> logger)
         {
             _patientService = patientService;
+            _mapper = mapper;
             _logger = logger;
         }
 

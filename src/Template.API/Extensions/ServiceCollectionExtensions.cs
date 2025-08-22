@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+﻿using System.Reflection;
 using System.Text;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Template.Application.Common;
 
 namespace Template.API.Extensions
@@ -39,6 +42,14 @@ namespace Template.API.Extensions
             services.AddAuthorization();
 
             services.AddControllers();
+
+            // Add FluentValidation support
+            services.AddFluentValidationAutoValidation();
+            services.AddFluentValidationClientsideAdapters();
+
+            // Register AutoMapper for API layer
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
