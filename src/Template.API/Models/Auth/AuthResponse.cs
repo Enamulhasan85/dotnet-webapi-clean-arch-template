@@ -60,54 +60,6 @@ namespace Template.API.Models
         public List<string> Roles { get; set; } = new();
     }
 
-    /// <summary>
-    /// Request model for token refresh
-    /// </summary>
-    public class RefreshTokenRequest
-    {
-        /// <summary>
-        /// Expired access token
-        /// </summary>
-        [Required(ErrorMessage = "Access token is required")]
-        public required string AccessToken { get; set; }
-
-        /// <summary>
-        /// Valid refresh token
-        /// </summary>
-        [Required(ErrorMessage = "Refresh token is required")]
-        public required string RefreshToken { get; set; }
-    }
-
-    /// <summary>
-    /// Response model for token refresh
-    /// </summary>
-    public class RefreshTokenResponse
-    {
-        /// <summary>
-        /// New JWT access token
-        /// </summary>
-        public string AccessToken { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Token type (usually "Bearer")
-        /// </summary>
-        public string TokenType { get; set; } = "Bearer";
-
-        /// <summary>
-        /// Token expiration time in seconds
-        /// </summary>
-        public int ExpiresIn { get; set; }
-
-        /// <summary>
-        /// Token expiration timestamp
-        /// </summary>
-        public DateTime ExpiresAt { get; set; }
-
-        /// <summary>
-        /// New refresh token (optional)
-        /// </summary>
-        public string? RefreshToken { get; set; }
-    }
 
     /// <summary>
     /// Request model for password change

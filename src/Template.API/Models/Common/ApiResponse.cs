@@ -1,4 +1,4 @@
-namespace Template.API.Models
+namespace Template.API.Models.Common
 {
     public class ApiResponse<T>
     {
