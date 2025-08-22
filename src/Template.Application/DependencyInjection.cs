@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Template.Application.Interfaces;
 using Template.Application.Services;
 
 namespace Template.Application
@@ -14,6 +15,8 @@ namespace Template.Application
 
             // Register domain services
             services.AddScoped<DemoService>();
+            services.AddScoped<IPatientService, PatientService>();
+            services.AddScoped<IDoctorService, DoctorService>();
 
             return services;
         }

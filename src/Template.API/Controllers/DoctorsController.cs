@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.API.Models;
-using Template.Application.Abstractions;
-using Template.Domain.Entities;
+using Template.Application.Interfaces;
 
 namespace Template.API.Controllers
 {
@@ -11,12 +10,12 @@ namespace Template.API.Controllers
     [Produces("application/json")]
     public class DoctorsController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDoctorService _doctorService;
         private readonly ILogger<DoctorsController> _logger;
 
-        public DoctorsController(IUnitOfWork unitOfWork, ILogger<DoctorsController> logger)
+        public DoctorsController(IDoctorService doctorService, ILogger<DoctorsController> logger)
         {
-            _unitOfWork = unitOfWork;
+            _doctorService = doctorService;
             _logger = logger;
         }
 
@@ -27,7 +26,7 @@ namespace Template.API.Controllers
         /// <param name="pageSize">Page size (default: 10, max: 100)</param>
         /// <returns>Paginated list of doctors</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponse<Template.Application.Common.PaginatedResult<DoctorResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Template.Application.DTOs.PaginatedResult<DoctorResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -44,8 +43,8 @@ namespace Template.API.Controllers
                     return BadRequest(new ApiResponse("Page size must be between 1 and 100"));
                 }
 
-                var paginatedDoctors = await _unitOfWork.Doctors.GetPagedAsync(pageNumber, pageSize);
-                
+                var paginatedDoctors = await _doctorService.GetDoctorsPaginatedAsync(pageNumber, pageSize);
+
                 var doctorResponses = paginatedDoctors.Items.Select(d => new DoctorResponse
                 {
                     Id = d.Id,
@@ -53,13 +52,13 @@ namespace Template.API.Controllers
                     Specialty = d.Specialty
                 });
 
-                var result = new Template.Application.Common.PaginatedResult<DoctorResponse>(
+                var result = new Template.Application.DTOs.PaginatedResult<DoctorResponse>(
                     doctorResponses,
                     paginatedDoctors.TotalCount,
                     paginatedDoctors.PageNumber,
                     paginatedDoctors.PageSize);
 
-                return Ok(new ApiResponse<Template.Application.Common.PaginatedResult<DoctorResponse>>(result));
+                return Ok(new ApiResponse<Template.Application.DTOs.PaginatedResult<DoctorResponse>>(result));
             }
             catch (Exception ex)
             {
@@ -81,17 +80,17 @@ namespace Template.API.Controllers
         {
             try
             {
-                var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
-                if (doctor == null)
+                var doctorDto = await _doctorService.GetDoctorByIdAsync(id);
+                if (doctorDto == null)
                 {
                     return NotFound(new ApiResponse("Doctor not found"));
                 }
 
                 var response = new DoctorResponse
                 {
-                    Id = doctor.Id,
-                    Name = doctor.Name,
-                    Specialty = doctor.Specialty
+                    Id = doctorDto.Id,
+                    Name = doctorDto.Name,
+                    Specialty = doctorDto.Specialty
                 };
 
                 return Ok(new ApiResponse<DoctorResponse>(response));
@@ -122,28 +121,27 @@ namespace Template.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
-                var doctor = new Doctor
+                var createDoctorDto = new Template.Application.DTOs.CreateDoctorDto
                 {
                     Name = model.Name,
                     Specialty = model.Specialty
                 };
 
-                await _unitOfWork.Doctors.AddAsync(doctor);
-                await _unitOfWork.CompleteAsync();
+                var doctorDto = await _doctorService.CreateDoctorAsync(createDoctorDto);
 
                 var response = new DoctorResponse
                 {
-                    Id = doctor.Id,
-                    Name = doctor.Name,
-                    Specialty = doctor.Specialty
+                    Id = doctorDto.Id,
+                    Name = doctorDto.Name,
+                    Specialty = doctorDto.Specialty
                 };
 
-                _logger.LogInformation("Doctor created successfully with ID: {DoctorId}", doctor.Id);
-                return CreatedAtAction(nameof(GetDoctor), new { id = doctor.Id }, new ApiResponse<DoctorResponse>(response, "Doctor created successfully"));
+                _logger.LogInformation("Doctor created successfully with ID: {DoctorId}", doctorDto.Id);
+                return CreatedAtAction(nameof(GetDoctor), new { id = doctorDto.Id }, new ApiResponse<DoctorResponse>(response, "Doctor created successfully"));
             }
             catch (Exception ex)
             {
@@ -173,30 +171,30 @@ namespace Template.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
-                var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
-                if (doctor == null)
+                var updateDoctorDto = new Template.Application.DTOs.UpdateDoctorDto
+                {
+                    Name = model.Name,
+                    Specialty = model.Specialty
+                };
+
+                var doctorDto = await _doctorService.UpdateDoctorAsync(id, updateDoctorDto);
+                if (doctorDto == null)
                 {
                     return NotFound(new ApiResponse("Doctor not found"));
                 }
 
-                doctor.Name = model.Name;
-                doctor.Specialty = model.Specialty;
-
-                _unitOfWork.Doctors.Update(doctor);
-                await _unitOfWork.CompleteAsync();
-
                 var response = new DoctorResponse
                 {
-                    Id = doctor.Id,
-                    Name = doctor.Name,
-                    Specialty = doctor.Specialty
+                    Id = doctorDto.Id,
+                    Name = doctorDto.Name,
+                    Specialty = doctorDto.Specialty
                 };
 
-                _logger.LogInformation("Doctor updated successfully with ID: {DoctorId}", doctor.Id);
+                _logger.LogInformation("Doctor updated successfully with ID: {DoctorId}", doctorDto.Id);
                 return Ok(new ApiResponse<DoctorResponse>(response, "Doctor updated successfully"));
             }
             catch (Exception ex)
@@ -219,14 +217,11 @@ namespace Template.API.Controllers
         {
             try
             {
-                var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
-                if (doctor == null)
+                var result = await _doctorService.DeleteDoctorAsync(id);
+                if (!result)
                 {
                     return NotFound(new ApiResponse("Doctor not found"));
                 }
-
-                _unitOfWork.Doctors.Delete(doctor);
-                await _unitOfWork.CompleteAsync();
 
                 _logger.LogInformation("Doctor deleted successfully with ID: {DoctorId}", id);
                 return Ok(new ApiResponse("Doctor deleted successfully"));

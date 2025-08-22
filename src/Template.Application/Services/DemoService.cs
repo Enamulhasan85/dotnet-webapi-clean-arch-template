@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Template.Application.Abstractions;
+using Template.Application.Common.Interfaces;
 using Template.Domain.Entities;
 
 namespace Template.Application.Services

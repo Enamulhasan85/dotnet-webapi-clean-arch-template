@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.API.Models;
-using Template.Application.Abstractions;
-using Template.Domain.Entities;
+using Template.Application.Interfaces;
 
 namespace Template.API.Controllers
 {
@@ -11,12 +10,12 @@ namespace Template.API.Controllers
     [Produces("application/json")]
     public class PatientsController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IPatientService _patientService;
         private readonly ILogger<PatientsController> _logger;
 
-        public PatientsController(IUnitOfWork unitOfWork, ILogger<PatientsController> logger)
+        public PatientsController(IPatientService patientService, ILogger<PatientsController> logger)
         {
-            _unitOfWork = unitOfWork;
+            _patientService = patientService;
             _logger = logger;
         }
 
@@ -27,7 +26,7 @@ namespace Template.API.Controllers
         /// <param name="pageSize">Page size (default: 10, max: 100)</param>
         /// <returns>Paginated list of patients</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponse<Template.Application.Common.PaginatedResult<PatientResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Template.Application.DTOs.PaginatedResult<PatientResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPatients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -44,8 +43,8 @@ namespace Template.API.Controllers
                     return BadRequest(new ApiResponse("Page size must be between 1 and 100"));
                 }
 
-                var paginatedPatients = await _unitOfWork.Patients.GetPagedAsync(pageNumber, pageSize);
-                
+                var paginatedPatients = await _patientService.GetPatientsPaginatedAsync(pageNumber, pageSize);
+
                 var patientResponses = paginatedPatients.Items.Select(p => new PatientResponse
                 {
                     Id = p.Id,
@@ -53,13 +52,13 @@ namespace Template.API.Controllers
                     DateOfBirth = p.DateOfBirth
                 });
 
-                var result = new Template.Application.Common.PaginatedResult<PatientResponse>(
+                var result = new Template.Application.DTOs.PaginatedResult<PatientResponse>(
                     patientResponses,
                     paginatedPatients.TotalCount,
                     paginatedPatients.PageNumber,
                     paginatedPatients.PageSize);
 
-                return Ok(new ApiResponse<Template.Application.Common.PaginatedResult<PatientResponse>>(result));
+                return Ok(new ApiResponse<Template.Application.DTOs.PaginatedResult<PatientResponse>>(result));
             }
             catch (Exception ex)
             {
@@ -81,17 +80,17 @@ namespace Template.API.Controllers
         {
             try
             {
-                var patient = await _unitOfWork.Patients.GetByIdAsync(id);
-                if (patient == null)
+                var patientDto = await _patientService.GetPatientByIdAsync(id);
+                if (patientDto == null)
                 {
                     return NotFound(new ApiResponse("Patient not found"));
                 }
 
                 var response = new PatientResponse
                 {
-                    Id = patient.Id,
-                    Name = patient.Name,
-                    DateOfBirth = patient.DateOfBirth
+                    Id = patientDto.Id,
+                    Name = patientDto.Name,
+                    DateOfBirth = patientDto.DateOfBirth
                 };
 
                 return Ok(new ApiResponse<PatientResponse>(response));
@@ -122,28 +121,27 @@ namespace Template.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
-                var patient = new Patient
+                var createPatientDto = new Template.Application.DTOs.CreatePatientDto
                 {
                     Name = model.Name,
                     DateOfBirth = model.DateOfBirth
                 };
 
-                await _unitOfWork.Patients.AddAsync(patient);
-                await _unitOfWork.CompleteAsync();
+                var patientDto = await _patientService.CreatePatientAsync(createPatientDto);
 
                 var response = new PatientResponse
                 {
-                    Id = patient.Id,
-                    Name = patient.Name,
-                    DateOfBirth = patient.DateOfBirth
+                    Id = patientDto.Id,
+                    Name = patientDto.Name,
+                    DateOfBirth = patientDto.DateOfBirth
                 };
 
-                _logger.LogInformation("Patient created successfully with ID: {PatientId}", patient.Id);
-                return CreatedAtAction(nameof(GetPatient), new { id = patient.Id }, new ApiResponse<PatientResponse>(response, "Patient created successfully"));
+                _logger.LogInformation("Patient created successfully with ID: {PatientId}", patientDto.Id);
+                return CreatedAtAction(nameof(GetPatient), new { id = patientDto.Id }, new ApiResponse<PatientResponse>(response, "Patient created successfully"));
             }
             catch (Exception ex)
             {
@@ -173,30 +171,30 @@ namespace Template.API.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
-                var patient = await _unitOfWork.Patients.GetByIdAsync(id);
-                if (patient == null)
+                var updatePatientDto = new Template.Application.DTOs.UpdatePatientDto
+                {
+                    Name = model.Name,
+                    DateOfBirth = model.DateOfBirth
+                };
+
+                var patientDto = await _patientService.UpdatePatientAsync(id, updatePatientDto);
+                if (patientDto == null)
                 {
                     return NotFound(new ApiResponse("Patient not found"));
                 }
 
-                patient.Name = model.Name;
-                patient.DateOfBirth = model.DateOfBirth;
-
-                _unitOfWork.Patients.Update(patient);
-                await _unitOfWork.CompleteAsync();
-
                 var response = new PatientResponse
                 {
-                    Id = patient.Id,
-                    Name = patient.Name,
-                    DateOfBirth = patient.DateOfBirth
+                    Id = patientDto.Id,
+                    Name = patientDto.Name,
+                    DateOfBirth = patientDto.DateOfBirth
                 };
 
-                _logger.LogInformation("Patient updated successfully with ID: {PatientId}", patient.Id);
+                _logger.LogInformation("Patient updated successfully with ID: {PatientId}", patientDto.Id);
                 return Ok(new ApiResponse<PatientResponse>(response, "Patient updated successfully"));
             }
             catch (Exception ex)
@@ -219,14 +217,11 @@ namespace Template.API.Controllers
         {
             try
             {
-                var patient = await _unitOfWork.Patients.GetByIdAsync(id);
-                if (patient == null)
+                var result = await _patientService.DeletePatientAsync(id);
+                if (!result)
                 {
                     return NotFound(new ApiResponse("Patient not found"));
                 }
-
-                _unitOfWork.Patients.Delete(patient);
-                await _unitOfWork.CompleteAsync();
 
                 _logger.LogInformation("Patient deleted successfully with ID: {PatientId}", id);
                 return Ok(new ApiResponse("Patient deleted successfully"));

@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Template.Application.Common;
+using Template.Application.Common.Interfaces;
 using Template.Domain.Identity;
 
-namespace Template.Infrastructure.Auth
+namespace Template.Infrastructure.Services
 {
     public class TokenService : ITokenService
     {

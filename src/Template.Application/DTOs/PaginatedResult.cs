@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace Template.Application.Common
+namespace Template.Application.DTOs
 {
     public class PaginatedResult<T>
     {

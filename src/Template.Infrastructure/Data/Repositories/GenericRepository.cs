@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Template.Application.Abstractions;
-using Template.Application.Common;
-using Template.Infrastructure.Persistence;
+using Template.Application.Common.Interfaces;
+using Template.Application.DTOs;
+using Template.Infrastructure.Data.Contexts;
 
-namespace Template.Infrastructure.Repositories
+namespace Template.Infrastructure.Data.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

@@ -2,7 +2,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Template.Domain.Identity;
 
-namespace Template.Infrastructure.Auth
+namespace Template.Application.Common.Interfaces
 {
     public interface ITokenService
     {

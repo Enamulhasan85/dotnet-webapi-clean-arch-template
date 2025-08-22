@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Template.Application.Common;
+using Template.Application.DTOs;
 
-namespace Template.Application.Abstractions
+namespace Template.Application.Common.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {

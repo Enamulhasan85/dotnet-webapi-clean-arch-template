@@ -1,8 +1,8 @@
-using Template.Application.Abstractions;
+using Template.Application.Common.Interfaces;
 using Template.Domain.Entities;
-using Template.Infrastructure.Persistence;
+using Template.Infrastructure.Data.Contexts;
 
-namespace Template.Infrastructure.Repositories
+namespace Template.Infrastructure.Data.Repositories
 {
     public class PatientRepository : GenericRepository<Patient>, IPatientRepository
     {

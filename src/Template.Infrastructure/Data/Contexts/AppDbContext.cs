@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Template.Domain.Entities;
 
-namespace Template.Infrastructure.Persistence
+namespace Template.Infrastructure.Data.Contexts
 {
     public class AppDbContext : DbContext
     {

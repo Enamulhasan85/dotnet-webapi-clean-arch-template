@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Template.Infrastructure.Auth;
 using Microsoft.AspNetCore.Mvc;
-using Template.Domain.Identity;
-using Template.API.Models;
-using System.Security.Claims;
 using Microsoft.AspNetCore.RateLimiting;
+using Template.API.Models;
+using Template.Application.Common.Interfaces;
+using Template.Domain.Identity;
 
 namespace Template.Api.Controllers
 {
@@ -20,8 +20,8 @@ namespace Template.Api.Controllers
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
-            UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, 
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             ITokenService tokenService,
             ILogger<AuthController> logger)
         {
@@ -51,7 +51,7 @@ namespace Template.Api.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     _logger.LogWarning("Registration failed due to validation errors for email: {Email}", model.Email);
                     return BadRequest(new ApiResponse(errors));
                 }
@@ -79,7 +79,7 @@ namespace Template.Api.Controllers
                 if (!result.Succeeded)
                 {
                     var errors = result.Errors.Select(e => e.Description).ToList();
-                    _logger.LogWarning("User registration failed for email: {Email}. Errors: {Errors}", 
+                    _logger.LogWarning("User registration failed for email: {Email}. Errors: {Errors}",
                         model.Email, string.Join(", ", errors));
                     return BadRequest(new ApiResponse(errors));
                 }
@@ -122,7 +122,7 @@ namespace Template.Api.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     _logger.LogWarning("Login failed due to validation errors for email: {Email}", model.Email);
                     return BadRequest(new ApiResponse(errors));
                 }
@@ -149,7 +149,7 @@ namespace Template.Api.Controllers
                 }
 
                 var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: true);
-                
+
                 if (!result.Succeeded)
                 {
                     if (result.IsLockedOut)
@@ -157,7 +157,7 @@ namespace Template.Api.Controllers
                         _logger.LogWarning("Account locked out for email: {Email}", model.Email);
                         return Unauthorized(new ApiResponse("Account is temporarily locked due to multiple failed attempts"));
                     }
-                    
+
                     _logger.LogWarning("Invalid login attempt for email: {Email}", model.Email);
                     return Unauthorized(new ApiResponse("Invalid email or password"));
                 }
@@ -172,7 +172,7 @@ namespace Template.Api.Controllers
                 var token = await _tokenService.GenerateJwtTokenAsync(user);
                 var expiresAt = DateTime.UtcNow.AddHours(24); // Adjust based on your JWT settings
                 var userRoles = await _userManager.GetRolesAsync(user);
-                
+
                 var response = new LoginResponse
                 {
                     AccessToken = token,
@@ -264,7 +264,7 @@ namespace Template.Api.Controllers
                 await _signInManager.SignOutAsync();
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 _logger.LogInformation("User logged out successfully: {UserId}", userId);
-                
+
                 return Ok(new ApiResponse("Logged out successfully"));
             }
             catch (Exception ex)
@@ -293,7 +293,7 @@ namespace Template.Api.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
@@ -361,7 +361,7 @@ namespace Template.Api.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
@@ -381,7 +381,7 @@ namespace Template.Api.Controllers
                 if (!result.Succeeded)
                 {
                     var errors = result.Errors.Select(e => e.Description).ToList();
-                    _logger.LogWarning("Password change failed for user: {UserId}. Errors: {Errors}", 
+                    _logger.LogWarning("Password change failed for user: {UserId}. Errors: {Errors}",
                         userId, string.Join(", ", errors));
                     return BadRequest(new ApiResponse(errors));
                 }
@@ -414,7 +414,7 @@ namespace Template.Api.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
@@ -427,10 +427,10 @@ namespace Template.Api.Controllers
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                
+
                 // TODO: Send email with reset token
                 // For now, just log it (remove in production)
-                _logger.LogInformation("Password reset token generated for user: {Email}. Token: {Token}", 
+                _logger.LogInformation("Password reset token generated for user: {Email}. Token: {Token}",
                     model.Email, token);
 
                 return Ok(new ApiResponse("If the email exists, a password reset link has been sent"));
@@ -460,7 +460,7 @@ namespace Template.Api.Controllers
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage)
                         .ToList();
-                    
+
                     return BadRequest(new ApiResponse(errors));
                 }
 
@@ -474,7 +474,7 @@ namespace Template.Api.Controllers
                 if (!result.Succeeded)
                 {
                     var errors = result.Errors.Select(e => e.Description).ToList();
-                    _logger.LogWarning("Password reset failed for user: {Email}. Errors: {Errors}", 
+                    _logger.LogWarning("Password reset failed for user: {Email}. Errors: {Errors}",
                         model.Email, string.Join(", ", errors));
                     return BadRequest(new ApiResponse(errors));
                 }

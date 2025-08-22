@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
-using Template.Application.Abstractions;
-using Template.Infrastructure.Persistence;
-using Template.Infrastructure.Repositories;
+using Template.Application.Common.Interfaces;
+using Template.Infrastructure.Data.Contexts;
+using Template.Infrastructure.Data.Repositories;
 
-namespace Template.Infrastructure
+namespace Template.Infrastructure.Data
 {
     public class UnitOfWork : IUnitOfWork
     {

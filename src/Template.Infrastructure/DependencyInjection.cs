@@ -2,11 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Template.Application.Abstractions;
+using Microsoft.Extensions.Options;
+using Template.Application.Common.Interfaces;
 using Template.Domain.Identity;
-using Template.Infrastructure.Auth;
-using Template.Infrastructure.Persistence;
-using Template.Infrastructure.Repositories;
+using Template.Infrastructure.Data;
+using Template.Infrastructure.Data.Contexts;
+using Template.Infrastructure.Data.Repositories;
+using Template.Infrastructure.Data.Seed;
+using Template.Infrastructure.Data.Seed.Configuration;
+using Template.Infrastructure.Services;
 
 namespace Template.Infrastructure
 {
@@ -54,6 +58,13 @@ namespace Template.Infrastructure
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IDoctorRepository, DoctorRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Configure strongly typed options
+            services.Configure<DefaultUsersAndRolesOptions>(
+                configuration.GetSection("DefaultUsersAndRoles"));
+
+            // Register seeder
+            services.AddScoped<DbSeeder>();
 
             services.AddScoped<ITokenService, TokenService>();
 

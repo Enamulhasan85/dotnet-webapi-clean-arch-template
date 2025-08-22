@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Template.Application.Abstractions
+namespace Template.Application.Common.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {

@@ -2,13 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Template.API.Extensions;
 using Template.Application;
 using Template.Infrastructure;
-using Template.Infrastructure.Persistence;
+using Template.Infrastructure.Data.Contexts;
 
 namespace Template.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -18,33 +18,11 @@ namespace Template.API
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                // Migrate IdentityDbContext
-                var identityDbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-                try
-                {
-                    identityDbContext.Database.Migrate();
-                    //IdentityDbSeeder.Seed(identityDbContext, scope.ServiceProvider).GetAwaiter().GetResult();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Identity database migration failed: {ex.Message}");
-                    throw;
-                }
+            // Migrate databases
+            await app.MigrateDatabaseAsync();
 
-                // Migrate AppDbContext
-                var appDbContext = scope.ServiceProvider.GetRequiredService<Template.Infrastructure.Persistence.AppDbContext>();
-                try
-                {
-                    appDbContext.Database.Migrate();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"App database migration failed: {ex.Message}");
-                    throw;
-                }
-            }
+            // Seed database with default data
+            await app.SeedDatabaseAsync();
 
             if (app.Environment.IsDevelopment())
             {
@@ -53,7 +31,7 @@ namespace Template.API
             }
 
             app.UseHttpsRedirection();
-            
+
             app.UseExceptionHandler("/error");
 
             app.UseAuthentication();

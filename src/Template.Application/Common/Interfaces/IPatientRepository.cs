@@ -1,6 +1,6 @@
 using Template.Domain.Entities;
 
-namespace Template.Application.Abstractions
+namespace Template.Application.Common.Interfaces
 {
     public interface IPatientRepository : IGenericRepository<Patient>
     {
