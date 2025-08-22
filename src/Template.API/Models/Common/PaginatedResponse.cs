@@ -11,12 +11,12 @@ namespace Template.API.Models.Common
         /// <summary>
         /// List of items for the current page
         /// </summary>
-        public IEnumerable<T> Data { get; set; } = new List<T>();
+        public IEnumerable<T> Items { get; set; } = new List<T>();
 
         /// <summary>
         /// Current page number (1-based)
         /// </summary>
-        public int Page { get; set; }
+        public int PageNumber { get; set; }
 
         /// <summary>
         /// Number of items per page
@@ -36,12 +36,12 @@ namespace Template.API.Models.Common
         /// <summary>
         /// Whether there is a previous page
         /// </summary>
-        public bool HasPreviousPage => Page > 1;
+        public bool HasPreviousPage => PageNumber > 1;
 
         /// <summary>
         /// Whether there is a next page
         /// </summary>
-        public bool HasNextPage => Page < TotalPages;
+        public bool HasNextPage => PageNumber < TotalPages;
 
         /// <summary>
         /// Default constructor
@@ -57,10 +57,10 @@ namespace Template.API.Models.Common
         /// <param name="page">Current page number</param>
         /// <param name="pageSize">Items per page</param>
         /// <param name="totalCount">Total items count</param>
-        public PaginatedResponse(IEnumerable<T> data, int page, int pageSize, int totalCount)
+        public PaginatedResponse(IEnumerable<T> items, int pageNumber, int pageSize, int totalCount)
         {
-            Data = data;
-            Page = page;
+            Items = items;
+            PageNumber = pageNumber;
             PageSize = pageSize;
             TotalCount = totalCount;
             TotalPages = (int)System.Math.Ceiling((double)totalCount / pageSize);

@@ -30,7 +30,7 @@ namespace Template.API.Models.Common
         public static ErrorResponse ValidationError(string detail, Dictionary<string, string[]>? errors = null)
         {
             var response = new ErrorResponse("https://tools.ietf.org/html/rfc7231#section-6.5.1", "Validation Error", 400, detail);
-            
+
             if (errors != null && errors.Any())
             {
                 response.Extensions = new Dictionary<string, object> { { "errors", errors } };

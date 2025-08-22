@@ -1,5 +1,5 @@
-using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 namespace Template.API.Extensions
 {
