@@ -3,6 +3,7 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Template.Application.Common;
 
@@ -41,7 +42,21 @@ namespace Template.API.Extensions
 
             services.AddAuthorization();
 
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                // Add global filters to eliminate repetitive code
+                options.Filters.Add<Template.API.Common.Filters.ExceptionFilter>();
+                options.Filters.Add<Template.API.Common.Filters.GlobalValidationFilter>();
+
+                // Add pagination validation filter
+                options.Filters.Add(new Template.API.Common.Filters.GlobalPaginationValidationFilter(maxPageSize: 100));
+            });
+
+            // Disable automatic model validation since we handle it globally
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             // Add FluentValidation support
             services.AddFluentValidationAutoValidation();
