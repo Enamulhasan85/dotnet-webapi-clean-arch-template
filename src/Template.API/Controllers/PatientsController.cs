@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Template.API.Common.Attributes;
 using Template.API.Common.Extensions;
 using Template.API.Controllers.Common;
 using Template.API.Models;
@@ -35,6 +36,7 @@ namespace Template.API.Controllers
         /// <param name="pageSize">Page size (default: 10, max: 100)</param>
         /// <returns>Paginated list of patients</returns>
         [HttpGet]
+        [Cache]
         [ProducesResponseType(typeof(ApiResponse<Template.Application.DTOs.PaginatedResult<PatientResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]

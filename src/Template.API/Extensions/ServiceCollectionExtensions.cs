@@ -70,6 +70,18 @@ namespace Template.API.Extensions
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
+            // Add Memory Cache support with size limits
+            services.AddMemoryCache(options =>
+            {
+                var cacheSection = configuration.GetSection("CacheSettings");
+                var maxCacheSize = cacheSection.GetValue<int?>("MaxCacheSize") ?? 1000;
+                options.SizeLimit = maxCacheSize;
+            });
+
+            // Configure cache options
+            services.Configure<Template.API.Settings.CacheOptions>(
+                configuration.GetSection("CacheSettings"));
+
             // Register custom services
             services.AddScoped<Template.API.Services.IValidationService, Template.API.Services.ValidationService>();
 

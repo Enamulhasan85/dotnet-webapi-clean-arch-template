@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Template.API.Common.Attributes;
 using Template.API.Common.Extensions;
 using Template.API.Controllers.Common;
 using Template.API.Models;
@@ -31,6 +32,7 @@ namespace Template.API.Controllers
         /// <param name="pageSize">Page size (default: 10, max: 100)</param>
         /// <returns>Paginated list of doctors</returns>
         [HttpGet]
+        [Cache]
         [ProducesResponseType(typeof(ApiResponse<Template.Application.DTOs.PaginatedResult<DoctorResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
@@ -60,6 +62,7 @@ namespace Template.API.Controllers
         /// <param name="id">Doctor ID</param>
         /// <returns>Doctor details</returns>
         [HttpGet("{id}")]
+        [Cache(600)] // Cache for 10 minutes using default settings from IOptions
         [ProducesResponseType(typeof(ApiResponse<DoctorResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]

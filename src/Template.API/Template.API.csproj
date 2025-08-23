@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Models\" />
-    <Folder Include="Settings\" />
   </ItemGroup>
 
 </Project>
