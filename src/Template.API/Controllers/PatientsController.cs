@@ -1,15 +1,21 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Template.API.Common.Extensions;
+using Template.API.Controllers.Common;
 using Template.API.Models;
+using Template.API.Models.Common;
+using Template.API.Models.Patients;
 using Template.Application.Common.Interfaces;
+using Template.Application.Features.Patients.DTOs;
+using Template.Application.Features.Patients.Services;
 
 namespace Template.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class PatientsController : ControllerBase
+    public class PatientsController : BaseController
     {
         private readonly IPatientService _patientService;
         private readonly IMapper _mapper;
@@ -34,40 +40,22 @@ namespace Template.API.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPatients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            try
+            var paginatedPatients = await _patientService.GetPatientsPaginatedAsync(pageNumber, pageSize);
+
+            var patientResponses = paginatedPatients.Items.Select(p => new PatientResponse
             {
-                if (pageNumber < 1)
-                {
-                    return BadRequest(new ApiResponse("Page number must be greater than 0"));
-                }
+                Id = p.Id,
+                Name = p.Name,
+                DateOfBirth = p.DateOfBirth
+            });
 
-                if (pageSize < 1 || pageSize > 100)
-                {
-                    return BadRequest(new ApiResponse("Page size must be between 1 and 100"));
-                }
+            var result = new Template.Application.DTOs.PaginatedResult<PatientResponse>(
+                patientResponses,
+                paginatedPatients.TotalCount,
+                paginatedPatients.PageNumber,
+                paginatedPatients.PageSize);
 
-                var paginatedPatients = await _patientService.GetPatientsPaginatedAsync(pageNumber, pageSize);
-
-                var patientResponses = paginatedPatients.Items.Select(p => new PatientResponse
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    DateOfBirth = p.DateOfBirth
-                });
-
-                var result = new Template.Application.DTOs.PaginatedResult<PatientResponse>(
-                    patientResponses,
-                    paginatedPatients.TotalCount,
-                    paginatedPatients.PageNumber,
-                    paginatedPatients.PageSize);
-
-                return Ok(new ApiResponse<Template.Application.DTOs.PaginatedResult<PatientResponse>>(result));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving patients");
-                return StatusCode(500, new ApiResponse("An error occurred while retrieving patients"));
-            }
+            return SuccessResponse(result);
         }
 
         /// <summary>
@@ -81,28 +69,20 @@ namespace Template.API.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPatient(int id)
         {
-            try
+            var patientDto = await _patientService.GetPatientByIdAsync(id);
+            if (patientDto == null)
             {
-                var patientDto = await _patientService.GetPatientByIdAsync(id);
-                if (patientDto == null)
-                {
-                    return NotFound(new ApiResponse("Patient not found"));
-                }
-
-                var response = new PatientResponse
-                {
-                    Id = patientDto.Id,
-                    Name = patientDto.Name,
-                    DateOfBirth = patientDto.DateOfBirth
-                };
-
-                return Ok(new ApiResponse<PatientResponse>(response));
+                return HandleEntityNotFound("Patient", id);
             }
-            catch (Exception ex)
+
+            var response = new PatientResponse
             {
-                _logger.LogError(ex, "An error occurred while retrieving patient with ID: {PatientId}", id);
-                return StatusCode(500, new ApiResponse("An error occurred while retrieving patient"));
-            }
+                Id = patientDto.Id,
+                Name = patientDto.Name,
+                DateOfBirth = patientDto.DateOfBirth
+            };
+
+            return HandleEntityFound(response, "Patient");
         }
 
         /// <summary>
@@ -116,41 +96,27 @@ namespace Template.API.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreatePatient([FromBody] CreatePatientRequest model)
         {
-            try
+            if (ModelState.HasValidationErrors())
             {
-                if (!ModelState.IsValid)
-                {
-                    var errors = ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage)
-                        .ToList();
-
-                    return BadRequest(new ApiResponse(errors));
-                }
-
-                var createPatientDto = new Template.Application.DTOs.CreatePatientDto
-                {
-                    Name = model.Name,
-                    DateOfBirth = model.DateOfBirth
-                };
-
-                var patientDto = await _patientService.CreatePatientAsync(createPatientDto);
-
-                var response = new PatientResponse
-                {
-                    Id = patientDto.Id,
-                    Name = patientDto.Name,
-                    DateOfBirth = patientDto.DateOfBirth
-                };
-
-                _logger.LogInformation("Patient created successfully with ID: {PatientId}", patientDto.Id);
-                return CreatedAtAction(nameof(GetPatient), new { id = patientDto.Id }, new ApiResponse<PatientResponse>(response, "Patient created successfully"));
+                return BadRequestResponse(ModelState.GetErrorMessages());
             }
-            catch (Exception ex)
+
+            var createPatientDto = new CreatePatientDto
             {
-                _logger.LogError(ex, "An error occurred while creating patient");
-                return StatusCode(500, new ApiResponse("An error occurred while creating patient"));
-            }
+                Name = model.Name,
+                DateOfBirth = model.DateOfBirth
+            };
+
+            var patientDto = await _patientService.CreatePatientAsync(createPatientDto);
+
+            var response = new PatientResponse
+            {
+                Id = patientDto.Id,
+                Name = patientDto.Name,
+                DateOfBirth = patientDto.DateOfBirth
+            };
+
+            return HandleEntityCreated(response, "Patient");
         }
 
         /// <summary>
@@ -166,45 +132,31 @@ namespace Template.API.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdatePatient(int id, [FromBody] UpdatePatientRequest model)
         {
-            try
+            if (ModelState.HasValidationErrors())
             {
-                if (!ModelState.IsValid)
-                {
-                    var errors = ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage)
-                        .ToList();
-
-                    return BadRequest(new ApiResponse(errors));
-                }
-
-                var updatePatientDto = new Template.Application.DTOs.UpdatePatientDto
-                {
-                    Name = model.Name,
-                    DateOfBirth = model.DateOfBirth
-                };
-
-                var patientDto = await _patientService.UpdatePatientAsync(id, updatePatientDto);
-                if (patientDto == null)
-                {
-                    return NotFound(new ApiResponse("Patient not found"));
-                }
-
-                var response = new PatientResponse
-                {
-                    Id = patientDto.Id,
-                    Name = patientDto.Name,
-                    DateOfBirth = patientDto.DateOfBirth
-                };
-
-                _logger.LogInformation("Patient updated successfully with ID: {PatientId}", patientDto.Id);
-                return Ok(new ApiResponse<PatientResponse>(response, "Patient updated successfully"));
+                return BadRequestResponse(ModelState.GetErrorMessages());
             }
-            catch (Exception ex)
+
+            var updatePatientDto = new UpdatePatientDto
             {
-                _logger.LogError(ex, "An error occurred while updating patient with ID: {PatientId}", id);
-                return StatusCode(500, new ApiResponse("An error occurred while updating patient"));
+                Name = model.Name,
+                DateOfBirth = model.DateOfBirth
+            };
+
+            var patientDto = await _patientService.UpdatePatientAsync(id, updatePatientDto);
+            if (patientDto == null)
+            {
+                return HandleEntityNotFound("Patient", id);
             }
+
+            var response = new PatientResponse
+            {
+                Id = patientDto.Id,
+                Name = patientDto.Name,
+                DateOfBirth = patientDto.DateOfBirth
+            };
+
+            return HandleEntityUpdated(response, "Patient");
         }
 
         /// <summary>
@@ -218,22 +170,13 @@ namespace Template.API.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeletePatient(int id)
         {
-            try
+            var result = await _patientService.DeletePatientAsync(id);
+            if (!result)
             {
-                var result = await _patientService.DeletePatientAsync(id);
-                if (!result)
-                {
-                    return NotFound(new ApiResponse("Patient not found"));
-                }
+                return HandleEntityNotFound("Patient", id);
+            }
 
-                _logger.LogInformation("Patient deleted successfully with ID: {PatientId}", id);
-                return Ok(new ApiResponse("Patient deleted successfully"));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while deleting patient with ID: {PatientId}", id);
-                return StatusCode(500, new ApiResponse("An error occurred while deleting patient"));
-            }
+            return HandleEntityDeleted("Patient");
         }
     }
 }

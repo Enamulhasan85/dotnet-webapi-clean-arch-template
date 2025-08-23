@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Template.API.Common.Extensions;
+using Template.API.Controllers.Common;
 using Template.API.Models;
+using Template.API.Models.Auth;
+using Template.API.Models.Common;
 using Template.Application.Common.Interfaces;
 using Template.Domain.Identity;
 
@@ -12,7 +16,7 @@ namespace Template.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -45,15 +49,10 @@ namespace Template.Api.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
+                if (ModelState.HasValidationErrors())
                 {
-                    var errors = ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage)
-                        .ToList();
-
                     _logger.LogWarning("Registration failed due to validation errors for email: {Email}", model.Email);
-                    return BadRequest(new ApiResponse(errors));
+                    return BadRequestResponse(ModelState.GetErrorMessages());
                 }
 
                 // Check if user already exists
@@ -81,7 +80,7 @@ namespace Template.Api.Controllers
                     var errors = result.Errors.Select(e => e.Description).ToList();
                     _logger.LogWarning("User registration failed for email: {Email}. Errors: {Errors}",
                         model.Email, string.Join(", ", errors));
-                    return BadRequest(new ApiResponse(errors));
+                    return BadRequestResponse(errors);
                 }
 
                 var response = new RegisterResponse
@@ -94,12 +93,12 @@ namespace Template.Api.Controllers
                 };
 
                 _logger.LogInformation("User registered successfully: {Email}", model.Email);
-                return CreatedAtAction(nameof(GetProfile), new { }, new ApiResponse<RegisterResponse>(response, "User registered successfully"));
+                return CreatedAtAction(nameof(GetProfile), new { }, SuccessResponse(response, "User registered successfully"));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred during user registration for email: {Email}", model.Email);
-                return StatusCode(500, new ApiResponse("An error occurred during registration"));
+                return InternalServerErrorResponse("An error occurred during registration");
             }
         }
 
@@ -297,7 +296,11 @@ namespace Template.Api.Controllers
                     return BadRequest(new ApiResponse(errors));
                 }
 
-                // Validate the refresh token (implement your refresh token validation logic)
+                if (string.IsNullOrEmpty(model.AccessToken))
+                {
+                    return BadRequest(new ApiResponse("Access token is required"));
+                }
+
                 var principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken);
                 if (principal == null)
                 {
