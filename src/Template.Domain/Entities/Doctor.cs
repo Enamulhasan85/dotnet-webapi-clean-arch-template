@@ -1,10 +1,14 @@
-namespace Template.Domain.Entities
+using Template.Domain.Common;
+using Template.Domain.Enums;
+using Template.Domain.ValueObjects;
+
+namespace Template.Domain.Entities;
+
+public class Doctor : AuditableEntity<int>
 {
-    public class Doctor
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Specialty { get; set; } = string.Empty;
-        // Add more properties as needed
-    }
+    public int UserProfileId { get; set; }
+    public UserProfile? UserProfile { get; set; }
+
+    public DoctorSpecialty Specialty { get; set; }
+    public string LicenseNumber { get; set; } = string.Empty;
 }
