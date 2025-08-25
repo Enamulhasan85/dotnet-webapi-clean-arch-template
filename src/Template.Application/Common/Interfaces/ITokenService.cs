@@ -1,13 +1,11 @@
 using System.Security.Claims;
-using System.Threading.Tasks;
-using Template.Domain.Identity;
 
-namespace Template.Application.Common.Interfaces
+namespace Template.Application.Common.Interfaces;
+
+public interface ITokenService
 {
-    public interface ITokenService
-    {
-        Task<string> GenerateJwtTokenAsync(ApplicationUser user);
-        string GenerateRefreshToken();
-        ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
-    }
+    Task<string> GenerateTokenAsync(string userId, string email, IEnumerable<string> roles);
+    Task<string> GenerateRefreshTokenAsync();
+    Task<bool> ValidateTokenAsync(string token);
+    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
 }

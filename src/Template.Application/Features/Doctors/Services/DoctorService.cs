@@ -1,9 +1,11 @@
 using AutoMapper;
 using Template.Application.Common.Interfaces;
-using Template.Application.DTOs;
+using Template.Application.Common.Models;
+using Template.Application.Features.Doctors.DTOs;
+using Template.Application.Features.Doctors.Services;
 using Template.Domain.Entities;
 
-namespace Template.Application.Services
+namespace Template.Application.Features.Doctors.Services
 {
     public class DoctorService : IDoctorService
     {
@@ -18,7 +20,8 @@ namespace Template.Application.Services
 
         public async Task<PaginatedResult<DoctorDto>> GetDoctorsPaginatedAsync(int pageNumber, int pageSize)
         {
-            var paginatedDoctors = await _unitOfWork.Doctors.GetPagedAsync(pageNumber, pageSize);
+            var paginatedDoctors = await _unitOfWork.Doctors.GetPaginatedAsync(
+                pageNumber, pageSize, null, null, false);
 
             var doctorDtos = _mapper.Map<IEnumerable<DoctorDto>>(paginatedDoctors.Items);
 
@@ -43,7 +46,7 @@ namespace Template.Application.Services
             var doctor = _mapper.Map<Doctor>(createDoctorDto);
 
             await _unitOfWork.Doctors.AddAsync(doctor);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<DoctorDto>(doctor);
         }
@@ -56,8 +59,8 @@ namespace Template.Application.Services
 
             _mapper.Map(updateDoctorDto, doctor);
 
-            _unitOfWork.Doctors.Update(doctor);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Doctors.UpdateAsync(doctor);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<DoctorDto>(doctor);
         }
@@ -68,8 +71,8 @@ namespace Template.Application.Services
             if (doctor == null)
                 return false;
 
-            _unitOfWork.Doctors.Delete(doctor);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Doctors.DeleteAsync(doctor);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
     }

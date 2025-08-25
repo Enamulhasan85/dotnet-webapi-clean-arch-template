@@ -1,9 +1,9 @@
 using Template.Domain.Entities;
 
-namespace Template.Application.Common.Interfaces
+namespace Template.Application.Common.Interfaces;
+
+public interface IDoctorRepository : IRepository<Doctor, int>
 {
-    public interface IDoctorRepository : IGenericRepository<Doctor>
-    {
-        // Add doctor-specific methods here
-    }
+    Task<IEnumerable<Doctor>> GetDoctorsBySpecialtyAsync(string specialty, CancellationToken cancellationToken = default);
+    Task<Doctor?> GetDoctorWithUserProfileAsync(int id, CancellationToken cancellationToken = default);
 }

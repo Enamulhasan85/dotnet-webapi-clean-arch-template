@@ -66,57 +66,59 @@ src/
 │   ├── Features/
 │   │   ├── Doctors/
 │   │   │   ├── Commands/
-│   │   │   │   ├── CreateDoctor/
-│   │   │   │   │   ├── CreateDoctorCommand.cs
-│   │   │   │   │   ├── CreateDoctorHandler.cs
-│   │   │   │   │   └── CreateDoctorValidator.cs
-│   │   │   │   ├── UpdateDoctor/
-│   │   │   │   │   ├── UpdateDoctorCommand.cs
-│   │   │   │   │   ├── UpdateDoctorHandler.cs
-│   │   │   │   │   └── UpdateDoctorValidator.cs
-│   │   │   │   └── DeleteDoctor/
-│   │   │   │       ├── DeleteDoctorCommand.cs
-│   │   │   │       └── DeleteDoctorHandler.cs
-│   │   │   ├── Queries/
-│   │   │   │   ├── GetDoctor/
-│   │   │   │   │   ├── GetDoctorQuery.cs
-│   │   │   │   │   └── GetDoctorHandler.cs
-│   │   │   │   ├── GetDoctors/
-│   │   │   │   │   ├── GetDoctorsQuery.cs
-│   │   │   │   │   └── GetDoctorsHandler.cs
-│   │   │   │   └── GetDoctorsBySpecialty/
-│   │   │   │       ├── GetDoctorsBySpecialtyQuery.cs
-│   │   │   │       └── GetDoctorsBySpecialtyHandler.cs
+│   │   │   │   ├── CreateDoctorCommand.cs
+│   │   │   │   ├── UpdateDoctorCommand.cs
+│   │   │   │   ├── DeleteDoctorCommand.cs
 │   │   │   ├── DTOs/
 │   │   │   │   ├── DoctorDto.cs
 │   │   │   │   ├── CreateDoctorDto.cs
-│   │   │   │   └── UpdateDoctorDto.cs
-│   │   │   └── Services/
-│   │   │       ├── IDoctorService.cs
-│   │   │       └── DoctorService.cs
+│   │   │   │   ├── UpdateDoctorDto.cs
+│   │   │   ├── Queries/
+│   │   │   │   ├── GetDoctorQuery.cs
+│   │   │   │   ├── GetDoctorsQuery.cs
+│   │   │   │   ├── GetDoctorsBySpecialtyQuery.cs
+│   │   │   ├── Validators/
+│   │   │   │   ├── DoctorValidator.cs
+│   │   │   │   ├── CreateDoctorValidator.cs
+│   │   │   │   ├── UpdateDoctorValidator.cs
+│   │   │   │   ├── DeleteDoctorValidator.cs
 │   │   ├── Patients/
 │   │   │   ├── Commands/
-│   │   │   ├── Queries/
 │   │   │   ├── DTOs/
-│   │   │   └── Services/
+│   │   │   ├── Queries/
+│   │   │   └── Validators/
 │   │   └── ... (one per entity/feature)
 │   ├── Common/
-│   │   ├── Interfaces/
-│   │   │   ├── IRepository.cs
-│   │   │   ├── IUnitOfWork.cs
-│   │   │   └── IDateTimeService.cs
-│   │   ├── Mapping/
-│   │   │   └── (AutoMapper profiles and mapping configurations)
 │   │   ├── Behaviors/
 │   │   │   ├── ValidationBehavior.cs
-│   │   │   └── LoggingBehavior.cs
+│   │   │   ├── LoggingBehavior.cs
+│   │   ├── Commands/
+│   │   │   ├── BaseCommand.cs
+│   │   │   ├── ICommand.cs
 │   │   ├── Exceptions/
-│   │   │   ├── PatientNotFoundException.cs
+│   │   │   ├── ForbiddenException.cs
 │   │   │   ├── NotFoundException.cs
-│   │   │   └── ValidationException.cs
-│   │   └── Models/
-│   │       ├── PaginatedResult.cs
-│   │       └── Result.cs
+│   │   │   ├── ValidationException.cs
+│   │   ├── Interfaces/
+│   │   │   ├── ICurrentUserService.cs
+│   │   │   ├── IDateTimeService.cs
+│   │   │   ├── IRepository.cs
+│   │   │   ├── ITokenService.cs
+│   │   │   ├── IUnitOfWork.cs
+│   │   ├── Mapping/
+│   │   │   ├── DoctorMappingProfile.cs
+│   │   │   ├── PatientMappingProfile.cs
+│   │   │   └── (other AutoMapper profiles)
+│   │   ├── Models/
+│   │   │   ├── PaginatedRequest.cs
+│   │   │   ├── PaginatedResult.cs
+│   │   │   ├── Result.cs
+│   │   ├── Queries/
+│   │   │   ├── BaseQuery.cs
+│   │   │   ├── IQuery.cs
+│   │   ├── Services/
+│   │   │   ├── NotificationService.cs
+│   │   │   ├── AuthService.cs
 │   └── DependencyInjection.cs
 │
 ├── Template.Infrastructure/
@@ -161,7 +163,6 @@ src/
     ├── Enums/
     │   ├── DoctorSpecialty.cs           # Doctor specialties enumeration
     │   ├── PatientStatus.cs             # Patient status enumeration
-    │   ├── UserRole.cs                  # User roles enumeration
     │   └── ... (other enumerations)
     ├── Events/
     │   ├── DoctorEvents/

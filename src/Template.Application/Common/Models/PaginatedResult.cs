@@ -1,4 +1,4 @@
-namespace Template.Application.DTOs
+namespace Template.Application.Common.Models
 {
     public class PaginatedResult<T>
     {

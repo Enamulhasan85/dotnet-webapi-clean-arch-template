@@ -14,10 +14,10 @@ public record Address
     {
         if (string.IsNullOrWhiteSpace(street))
             throw new ArgumentException("Street cannot be empty", nameof(street));
-        
+
         if (string.IsNullOrWhiteSpace(city))
             throw new ArgumentException("City cannot be empty", nameof(city));
-        
+
         if (string.IsNullOrWhiteSpace(postalCode))
             throw new ArgumentException("Postal code cannot be empty", nameof(postalCode));
 
@@ -25,7 +25,7 @@ public record Address
         City = city.Trim();
         State = state?.Trim() ?? string.Empty;
         PostalCode = postalCode.Trim();
-        Country = country?.Trim() ?? "USA";
+        Country = country?.Trim() ?? string.Empty;
     }
 
     public override string ToString()

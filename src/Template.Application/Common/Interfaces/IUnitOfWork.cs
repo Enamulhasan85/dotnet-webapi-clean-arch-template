@@ -1,12 +1,11 @@
-using System;
-using System.Threading.Tasks;
+namespace Template.Application.Common.Interfaces;
 
-namespace Template.Application.Common.Interfaces
+public interface IUnitOfWork : IDisposable
 {
-    public interface IUnitOfWork : IDisposable
-    {
-        IPatientRepository Patients { get; }
-        IDoctorRepository Doctors { get; }
-        Task<int> CompleteAsync();
-    }
+    IDoctorRepository Doctors { get; }
+    IPatientRepository Patients { get; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task BeginTransactionAsync(CancellationToken cancellationToken = default);
+    Task CommitTransactionAsync(CancellationToken cancellationToken = default);
+    Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
 }

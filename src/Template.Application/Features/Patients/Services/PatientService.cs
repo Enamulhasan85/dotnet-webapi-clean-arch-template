@@ -1,9 +1,11 @@
 using AutoMapper;
 using Template.Application.Common.Interfaces;
-using Template.Application.DTOs;
+using Template.Application.Common.Models;
+using Template.Application.Features.Patients.DTOs;
+using Template.Application.Features.Patients.Services;
 using Template.Domain.Entities;
 
-namespace Template.Application.Services
+namespace Template.Application.Features.Patients.Services
 {
     public class PatientService : IPatientService
     {
@@ -18,7 +20,8 @@ namespace Template.Application.Services
 
         public async Task<PaginatedResult<PatientDto>> GetPatientsPaginatedAsync(int pageNumber, int pageSize)
         {
-            var paginatedPatients = await _unitOfWork.Patients.GetPagedAsync(pageNumber, pageSize);
+            var paginatedPatients = await _unitOfWork.Patients.GetPaginatedAsync(
+                pageNumber, pageSize, null, null, false);
 
             var patientDtos = _mapper.Map<IEnumerable<PatientDto>>(paginatedPatients.Items);
 
@@ -43,7 +46,7 @@ namespace Template.Application.Services
             var patient = _mapper.Map<Patient>(createPatientDto);
 
             await _unitOfWork.Patients.AddAsync(patient);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<PatientDto>(patient);
         }
@@ -56,8 +59,8 @@ namespace Template.Application.Services
 
             _mapper.Map(updatePatientDto, patient);
 
-            _unitOfWork.Patients.Update(patient);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Patients.UpdateAsync(patient);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<PatientDto>(patient);
         }
@@ -68,8 +71,8 @@ namespace Template.Application.Services
             if (patient == null)
                 return false;
 
-            _unitOfWork.Patients.Delete(patient);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Patients.DeleteAsync(patient);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
     }
