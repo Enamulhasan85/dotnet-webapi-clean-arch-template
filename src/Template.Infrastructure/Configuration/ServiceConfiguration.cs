@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Template.Application.Common.Interfaces;
+using Template.Application.Common.Services;
 using Template.Infrastructure.Services;
 
 namespace Template.Infrastructure.Configuration
@@ -16,6 +17,7 @@ namespace Template.Infrastructure.Configuration
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IDateTimeService, DateTimeService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             return services;
         }

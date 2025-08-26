@@ -34,16 +34,16 @@ src/
 │   │       ├── ApiResponse.cs
 │   │       └── PaginatedResponse.cs
 │   ├── Common/
-│   │   ├── Mapping/
-│   │   │   ├── DoctorMappingProfile.cs
-│   │   │   ├── PatientMappingProfile.cs
-│   │   │   └── BaseMappingProfile.cs 
-│   │   ├── Filters/
-│   │   │   └── ExceptionFilter.cs
 │   │   ├── Attributes/
 │   │   │   └── CacheAttribute.cs
 │   │   ├── Extensions/
 │   │   │   └── ModelStateExtensions.cs
+│   │   ├── Filters/
+│   │   │   └── ExceptionFilter.cs
+│   │   ├── Mapping/
+│   │   │   ├── DoctorMappingProfile.cs
+│   │   │   ├── PatientMappingProfile.cs
+│   │   │   └── BaseMappingProfile.cs 
 │   │   └── Models/
 │   │       └── (Common model definitions)
 │   ├── Extensions/

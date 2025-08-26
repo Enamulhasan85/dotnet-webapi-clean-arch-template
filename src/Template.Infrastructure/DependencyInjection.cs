@@ -31,6 +31,9 @@ namespace Template.Infrastructure
             // Infrastructure services configuration
             services.AddInfrastructureServicesConfiguration();
 
+            // Email configuration
+            services.AddEmailConfiguration(configuration);
+
             // Seeding configuration
             services.AddSeedConfiguration(configuration);
 
