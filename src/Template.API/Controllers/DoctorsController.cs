@@ -6,8 +6,11 @@ using Template.API.Controllers.Common;
 using Template.API.Models;
 using Template.API.Models.Common;
 using Template.API.Models.Doctors;
+using Template.Application.Common.DTOs;
+using Template.Application.Common.Models;
 using Template.Application.Features.Doctors.DTOs;
 using Template.Application.Features.Doctors.Services;
+using Template.Domain.Enums;
 
 namespace Template.API.Controllers
 {
@@ -33,7 +36,7 @@ namespace Template.API.Controllers
         /// <returns>Paginated list of doctors</returns>
         [HttpGet]
         [Cache]
-        [ProducesResponseType(typeof(ApiResponse<Template.Application.DTOs.PaginatedResult<DoctorResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<PaginatedResult<DoctorResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -43,11 +46,11 @@ namespace Template.API.Controllers
             var doctorResponses = paginatedDoctors.Items.Select(d => new DoctorResponse
             {
                 Id = d.Id,
-                Name = d.Name,
-                Specialty = d.Specialty
+                Name = d.UserProfile.FullName,
+                Specialty = d.Specialty.ToString()
             });
 
-            var result = new Template.Application.DTOs.PaginatedResult<DoctorResponse>(
+            var result = new PaginatedResult<DoctorResponse>(
                 doctorResponses,
                 paginatedDoctors.TotalCount,
                 paginatedDoctors.PageNumber,
@@ -77,8 +80,8 @@ namespace Template.API.Controllers
             var response = new DoctorResponse
             {
                 Id = doctorDto.Id,
-                Name = doctorDto.Name,
-                Specialty = doctorDto.Specialty
+                Name = doctorDto.UserProfile.FullName,
+                Specialty = doctorDto.Specialty.ToString()
             };
 
             return HandleEntityFound(response, "Doctor");
@@ -100,10 +103,21 @@ namespace Template.API.Controllers
                 return BadRequestResponse(ModelState.GetErrorMessages());
             }
 
+            // Parse name into first and last name
+            var nameParts = model.Name.Split(' ', 2);
+            var firstName = nameParts[0];
+            var lastName = nameParts.Length > 1 ? nameParts[1] : "";
+
             var createDoctorDto = new CreateDoctorDto
             {
-                Name = model.Name,
-                Specialty = model.Specialty
+                UserProfile = new CreateUserProfileDto
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = "", // TODO: Add email field to CreateDoctorRequest
+                    PhoneNumber = "" // TODO: Add phone field to CreateDoctorRequest
+                },
+                Specialty = Enum.Parse<DoctorSpecialty>(model.Specialty, true)
             };
 
             var doctorDto = await _doctorService.CreateDoctorAsync(createDoctorDto);
@@ -111,8 +125,8 @@ namespace Template.API.Controllers
             var response = new DoctorResponse
             {
                 Id = doctorDto.Id,
-                Name = doctorDto.Name,
-                Specialty = doctorDto.Specialty
+                Name = doctorDto.UserProfile.FullName,
+                Specialty = doctorDto.Specialty.ToString()
             };
 
             _logger.LogInformation("Doctor created successfully with ID: {DoctorId}", doctorDto.Id);
@@ -137,10 +151,22 @@ namespace Template.API.Controllers
                 return BadRequestResponse(ModelState.GetErrorMessages());
             }
 
+            // Parse name into first and last name
+            var nameParts = model.Name.Split(' ', 2);
+            var firstName = nameParts[0];
+            var lastName = nameParts.Length > 1 ? nameParts[1] : "";
+
             var updateDoctorDto = new UpdateDoctorDto
             {
-                Name = model.Name,
-                Specialty = model.Specialty
+                Id = id,
+                UserProfile = new UserProfileDto
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = "", // TODO: Get existing email or add to request
+                    PhoneNumber = "" // TODO: Get existing phone or add to request
+                },
+                Specialty = Enum.Parse<DoctorSpecialty>(model.Specialty, true)
             };
 
             var doctorDto = await _doctorService.UpdateDoctorAsync(id, updateDoctorDto);
@@ -152,8 +178,8 @@ namespace Template.API.Controllers
             var response = new DoctorResponse
             {
                 Id = doctorDto.Id,
-                Name = doctorDto.Name,
-                Specialty = doctorDto.Specialty
+                Name = doctorDto.UserProfile.FullName,
+                Specialty = doctorDto.Specialty.ToString()
             };
 
             return HandleEntityUpdated(response, "Doctor");

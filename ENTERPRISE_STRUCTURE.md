@@ -118,15 +118,20 @@ src/
 │   │   │   ├── NotificationService.cs
 │   │   │   ├── AuthService.cs
 │   │   └── Settings/
-│   │       ├── JwtSettings.cs      # JWT business rules
-│   │       ├── EmailSettings.cs    # Email business rules
-│   │       └── CacheSettings.cs    # Cache business policie
+│   │       ├── JwtSettings.cs           # JWT business rules
+│   │       ├── EmailSettings.cs         # Email business rules
+│   │       ├── CacheSettings.cs         # Cache business policies
+│   │       ├── DefaultUsersAndRolesOptions.cs  # Default users and roles configuration
+│   │       └── UserSeedOptions.cs       # User seed configuration options
 │   └── DependencyInjection.cs
 │
 ├── Template.Infrastructure/
 │   ├── Configuration/
 │   │   ├── DatabaseConfiguration.cs    # EF Core setup
 │   │   ├── EmailConfiguration.cs       # SMTP/SendGrid setup
+│   │   ├── IdentityConfiguration.cs    # Identity setup
+│   │   ├── RepositoryConfiguration.cs  # Repository setup
+│   │   ├── SeedConfiguration.cs        # Database seeding setup
 │   │   └── CacheConfiguration.cs       # Redis/Memory cache setup
 │   ├── Data/
 │   │   ├── Contexts/
@@ -138,10 +143,7 @@ src/
 │   │   │   └── PatientRepository.cs
 │   │   ├── UnitOfWork.cs
 │   │   └── Seed/
-│   │       ├── DbSeeder.cs
-│   │       └── Configuration/
-│   │           ├── DefaultUsersAndRolesOptions.cs
-│   │           └── UserSeedOptions.cs
+│   │       └── DbSeeder.cs
 │   ├── Services/
 │   │   ├── CurrentUserService.cs
 │   │   ├── DateTimeService.cs

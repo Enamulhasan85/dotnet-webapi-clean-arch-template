@@ -69,7 +69,6 @@ namespace Template.Api.Controllers
                     Email = model.Email,
                     FullName = model.FullName,
                     EmailConfirmed = true, // Set to false if email confirmation is required
-                    CreatedAt = DateTime.UtcNow,
                     IsActive = true
                 };
 
@@ -88,7 +87,6 @@ namespace Template.Api.Controllers
                     UserId = user.Id,
                     Email = user.Email!,
                     FullName = user.FullName!,
-                    CreatedAt = user.CreatedAt,
                     RequiresEmailConfirmation = false // Set based on your configuration
                 };
 
@@ -168,9 +166,9 @@ namespace Template.Api.Controllers
                 user.LastLoginAt = DateTime.UtcNow;
                 await _userManager.UpdateAsync(user);
 
-                var token = await _tokenService.GenerateJwtTokenAsync(user);
-                var expiresAt = DateTime.UtcNow.AddHours(24); // Adjust based on your JWT settings
                 var userRoles = await _userManager.GetRolesAsync(user);
+                var token = await _tokenService.GenerateTokenAsync(user.Id, user.Email!, userRoles);
+                var expiresAt = DateTime.UtcNow.AddHours(24); // Adjust based on your JWT settings
 
                 var response = new LoginResponse
                 {
@@ -178,7 +176,7 @@ namespace Template.Api.Controllers
                     TokenType = "Bearer",
                     ExpiresIn = 86400, // 24 hours in seconds
                     ExpiresAt = expiresAt,
-                    RefreshToken = _tokenService.GenerateRefreshToken(), // If you implement refresh tokens
+                    RefreshToken = await _tokenService.GenerateRefreshTokenAsync(), // If you implement refresh tokens
                     User = new UserInfo
                     {
                         Id = user.Id,
@@ -233,7 +231,6 @@ namespace Template.Api.Controllers
                     Email = user.Email ?? string.Empty,
                     FullName = user.FullName ?? string.Empty,
                     EmailConfirmed = user.EmailConfirmed,
-                    CreatedAt = user.CreatedAt,
                     LastLoginAt = user.LastLoginAt,
                     IsActive = user.IsActive,
                     Roles = userRoles.ToList()
@@ -322,7 +319,8 @@ namespace Template.Api.Controllers
                 // TODO: Validate refresh token against stored refresh tokens
                 // For now, we'll generate new tokens
 
-                var newAccessToken = await _tokenService.GenerateJwtTokenAsync(user);
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var newAccessToken = await _tokenService.GenerateTokenAsync(user.Id, user.Email!, userRoles);
                 var expiresAt = DateTime.UtcNow.AddHours(24);
 
                 var response = new RefreshTokenResponse
@@ -331,7 +329,7 @@ namespace Template.Api.Controllers
                     TokenType = "Bearer",
                     ExpiresIn = 86400, // 24 hours in seconds
                     ExpiresAt = expiresAt,
-                    RefreshToken = _tokenService.GenerateRefreshToken() // Optionally issue new refresh token
+                    RefreshToken = await _tokenService.GenerateRefreshTokenAsync() // Optionally issue new refresh token
                 };
 
                 _logger.LogInformation("Token refreshed successfully for user: {UserId}", userId);

@@ -7,9 +7,12 @@ using Template.API.Controllers.Common;
 using Template.API.Models;
 using Template.API.Models.Common;
 using Template.API.Models.Patients;
+using Template.Application.Common.DTOs;
 using Template.Application.Common.Interfaces;
+using Template.Application.Common.Models;
 using Template.Application.Features.Patients.DTOs;
 using Template.Application.Features.Patients.Services;
+using Template.Domain.Enums;
 
 namespace Template.API.Controllers
 {
@@ -37,7 +40,7 @@ namespace Template.API.Controllers
         /// <returns>Paginated list of patients</returns>
         [HttpGet]
         [Cache]
-        [ProducesResponseType(typeof(ApiResponse<Template.Application.DTOs.PaginatedResult<PatientResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<PaginatedResult<PatientResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPatients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -47,11 +50,11 @@ namespace Template.API.Controllers
             var patientResponses = paginatedPatients.Items.Select(p => new PatientResponse
             {
                 Id = p.Id,
-                Name = p.Name,
-                DateOfBirth = p.DateOfBirth
+                Name = p.UserProfile.FullName,
+                DateOfBirth = p.UserProfile.DateOfBirth!.Value
             });
 
-            var result = new Template.Application.DTOs.PaginatedResult<PatientResponse>(
+            var result = new PaginatedResult<PatientResponse>(
                 patientResponses,
                 paginatedPatients.TotalCount,
                 paginatedPatients.PageNumber,
@@ -80,8 +83,8 @@ namespace Template.API.Controllers
             var response = new PatientResponse
             {
                 Id = patientDto.Id,
-                Name = patientDto.Name,
-                DateOfBirth = patientDto.DateOfBirth
+                Name = patientDto.UserProfile.FullName,
+                DateOfBirth = patientDto.UserProfile.DateOfBirth!.Value
             };
 
             return HandleEntityFound(response, "Patient");
@@ -103,10 +106,21 @@ namespace Template.API.Controllers
                 return BadRequestResponse(ModelState.GetErrorMessages());
             }
 
+            // Parse name into first and last name
+            var nameParts = model.Name.Split(' ', 2);
+            var firstName = nameParts[0];
+            var lastName = nameParts.Length > 1 ? nameParts[1] : "";
+
             var createPatientDto = new CreatePatientDto
             {
-                Name = model.Name,
-                DateOfBirth = model.DateOfBirth
+                UserProfile = new CreateUserProfileDto
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = "", // TODO: Add email field to CreatePatientRequest
+                    PhoneNumber = "", // TODO: Add phone field to CreatePatientRequest
+                    DateOfBirth = model.DateOfBirth
+                }
             };
 
             var patientDto = await _patientService.CreatePatientAsync(createPatientDto);
@@ -114,8 +128,8 @@ namespace Template.API.Controllers
             var response = new PatientResponse
             {
                 Id = patientDto.Id,
-                Name = patientDto.Name,
-                DateOfBirth = patientDto.DateOfBirth
+                Name = patientDto.UserProfile.FullName,
+                DateOfBirth = patientDto.UserProfile.DateOfBirth!.Value
             };
 
             return HandleEntityCreated(response, "Patient");
@@ -139,10 +153,22 @@ namespace Template.API.Controllers
                 return BadRequestResponse(ModelState.GetErrorMessages());
             }
 
+            // Parse name into first and last name
+            var nameParts = model.Name.Split(' ', 2);
+            var firstName = nameParts[0];
+            var lastName = nameParts.Length > 1 ? nameParts[1] : "";
+
             var updatePatientDto = new UpdatePatientDto
             {
-                Name = model.Name,
-                DateOfBirth = model.DateOfBirth
+                Id = id,
+                UserProfile = new UserProfileDto
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = "", // TODO: Get existing email or add to request
+                    PhoneNumber = "", // TODO: Get existing phone or add to request
+                    DateOfBirth = model.DateOfBirth
+                }
             };
 
             var patientDto = await _patientService.UpdatePatientAsync(id, updatePatientDto);
@@ -154,8 +180,8 @@ namespace Template.API.Controllers
             var response = new PatientResponse
             {
                 Id = patientDto.Id,
-                Name = patientDto.Name,
-                DateOfBirth = patientDto.DateOfBirth
+                Name = patientDto.UserProfile.FullName,
+                DateOfBirth = patientDto.UserProfile.DateOfBirth!.Value
             };
 
             return HandleEntityUpdated(response, "Patient");
