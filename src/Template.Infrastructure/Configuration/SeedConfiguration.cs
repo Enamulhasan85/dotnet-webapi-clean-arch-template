@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Template.Application.Common.Settings;
 using Template.Infrastructure.Data.Seed;
-using Template.Infrastructure.Data.Seed.Configuration;
 
 namespace Template.Infrastructure.Configuration
 {

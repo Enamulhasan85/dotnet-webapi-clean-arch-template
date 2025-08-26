@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Template.Application.Common.Settings;
 using Template.Domain.Identity;
-using Template.Infrastructure.Data.Seed.Configuration;
 
 namespace Template.Infrastructure.Data.Seed
 {

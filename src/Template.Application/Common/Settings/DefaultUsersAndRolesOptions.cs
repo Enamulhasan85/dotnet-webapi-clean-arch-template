@@ -1,4 +1,4 @@
-namespace Template.Infrastructure.Data.Seed.Configuration
+namespace Template.Application.Common.Settings
 {
     public class DefaultUsersAndRolesOptions
     {

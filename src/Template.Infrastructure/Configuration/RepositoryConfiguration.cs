@@ -13,9 +13,6 @@ namespace Template.Infrastructure.Configuration
         public static IServiceCollection AddRepositoryConfiguration(
             this IServiceCollection services)
         {
-            // Register generic repository (if needed for direct injection)
-            services.AddScoped(typeof(IRepository<,>), typeof(GenericRepository<,>));
-
             // Register specific repositories
             services.AddScoped<IPatientRepository, PatientRepository>();
             services.AddScoped<IDoctorRepository, DoctorRepository>();
