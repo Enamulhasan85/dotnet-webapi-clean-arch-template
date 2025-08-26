@@ -12,7 +12,7 @@ namespace Template.API.Models
         /// </summary>
         [Required(ErrorMessage = "Full name is required")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Full name must be between 2 and 100 characters")]
-        [RegularExpression(@"^[a-zA-Z\s\-'\.]+$", ErrorMessage = "Full name can only contain letters, spaces, hyphens, apostrophes, and periods")]
+        [RegularExpression(@"^[a-zA-Z0-9\s\-'\.]+$", ErrorMessage = "Full name can only contain letters, numbers, spaces, hyphens, apostrophes, and periods")]
         public required string FullName { get; set; }
 
         /// <summary>
@@ -57,11 +57,6 @@ namespace Template.API.Models
         /// User's full name
         /// </summary>
         public string FullName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Registration timestamp
-        /// </summary>
-        public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Whether email confirmation is required

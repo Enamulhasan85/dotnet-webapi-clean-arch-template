@@ -40,11 +40,6 @@ namespace Template.API.Models
         public bool EmailConfirmed { get; set; }
 
         /// <summary>
-        /// Account creation timestamp
-        /// </summary>
-        public DateTime CreatedAt { get; set; }
-
-        /// <summary>
         /// Last login timestamp
         /// </summary>
         public DateTime? LastLoginAt { get; set; }

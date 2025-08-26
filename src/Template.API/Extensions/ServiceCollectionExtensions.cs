@@ -110,6 +110,13 @@ namespace Template.API.Extensions
                 options.Filters.Add(new Template.API.Common.Filters.GlobalPaginationValidationFilter(maxPageSize: 100));
             });
 
+            // Configure routing options for lowercase URLs
+            services.Configure<RouteOptions>(options =>
+            {
+                options.LowercaseUrls = true;
+                options.LowercaseQueryStrings = true;
+            });
+
             // Disable automatic model validation since we handle it globally
             services.Configure<ApiBehaviorOptions>(options =>
             {

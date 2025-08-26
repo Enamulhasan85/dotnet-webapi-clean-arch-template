@@ -69,7 +69,7 @@ namespace Template.Api.Controllers
             };
 
             _logger.LogInformation("User registered successfully: {Email}", model.Email);
-            return CreatedAtAction(nameof(GetProfile), new { }, SuccessResponse(response, "User registered successfully"));
+            return CreatedResponse(response, "User registered successfully");
         }
 
         /// <summary>
@@ -85,13 +85,8 @@ namespace Template.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-
                 _logger.LogWarning("Login failed due to validation errors for email: {Email}", model.Email);
-                return BadRequest(new ApiResponse(errors));
+                return BadRequestResponse(ModelState.GetErrorMessages());
             }
 
             var command = new LoginCommand
@@ -105,7 +100,7 @@ namespace Template.Api.Controllers
 
             if (!result.Succeeded)
             {
-                return Unauthorized(new ApiResponse(result.Errors.FirstOrDefault() ?? "Login failed"));
+                return BadRequestResponse(result.Errors.FirstOrDefault() ?? "Login failed");
             }
 
             var response = new LoginResponse
@@ -126,7 +121,7 @@ namespace Template.Api.Controllers
             };
 
             _logger.LogInformation("User logged in successfully: {Email}", model.Email);
-            return Ok(new ApiResponse<LoginResponse>(response, "Login successful"));
+            return SuccessResponse(response, "Login successful");
         }
 
         /// <summary>
@@ -144,7 +139,7 @@ namespace Template.Api.Controllers
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("Failed to extract user ID from token");
-                return Unauthorized(new ApiResponse("Invalid token"));
+                return BadRequestResponse("Invalid token");
             }
 
             var query = new GetUserProfileQuery
@@ -156,7 +151,7 @@ namespace Template.Api.Controllers
 
             if (!result.Succeeded)
             {
-                return NotFound(new ApiResponse(result.Errors.FirstOrDefault() ?? "User not found"));
+                return NotFoundResponse(result.Errors.FirstOrDefault() ?? "User not found");
             }
 
             var response = new UserProfileResponse
@@ -170,7 +165,7 @@ namespace Template.Api.Controllers
                 Roles = result.Value.Roles
             };
 
-            return Ok(new ApiResponse<UserProfileResponse>(response));
+            return SuccessResponse(response);
         }
 
         /// <summary>
@@ -187,18 +182,13 @@ namespace Template.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-
-                return BadRequest(new ApiResponse(errors));
+                return BadRequestResponse(ModelState.GetErrorMessages());
             }
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized(new ApiResponse("Invalid token"));
+                return BadRequestResponse("Invalid token");
             }
 
             var command = new ChangePasswordCommand
@@ -212,11 +202,11 @@ namespace Template.Api.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest(new ApiResponse(result.Errors.FirstOrDefault() ?? "Password change failed"));
+                return BadRequestResponse(result.Errors.FirstOrDefault() ?? "Password change failed");
             }
 
             _logger.LogInformation("Password changed successfully for user: {UserId}", userId);
-            return Ok(new ApiResponse("Password changed successfully"));
+            return SuccessResponse("Password changed successfully");
         }
 
         // TODO: Implement other endpoints using dispatcher pattern
