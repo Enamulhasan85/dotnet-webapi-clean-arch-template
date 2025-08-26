@@ -20,17 +20,7 @@ namespace Template.API.Extensions
                 {
                     Title = "Template API",
                     Version = "v1",
-                    Description = "A Clean Architecture API Template with comprehensive features",
-                    Contact = new OpenApiContact
-                    {
-                        Name = "API Support",
-                        Email = "support@template.com"
-                    },
-                    License = new OpenApiLicense
-                    {
-                        Name = "MIT License",
-                        Url = new Uri("https://opensource.org/licenses/MIT")
-                    }
+                    Description = "A Clean Architecture API Template with comprehensive features"
                 });
 
                 // Include XML comments

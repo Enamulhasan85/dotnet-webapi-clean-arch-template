@@ -18,7 +18,7 @@ namespace Template.Infrastructure.Services
             _jwtSettings = jwtOptions.Value;
         }
 
-        public async Task<string> GenerateTokenAsync(string userId, string email, IEnumerable<string> roles)
+        public async Task<string> GenerateTokenAsync(string userId, string email, IEnumerable<string> roles, bool rememberMe = false)
         {
             var claims = new List<Claim>
             {
@@ -33,11 +33,15 @@ namespace Template.Infrastructure.Services
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            // Choose expiration time based on RememberMe
+            var expiryMinutes = rememberMe ? _jwtSettings.RememberMeExpiryMinutes : _jwtSettings.ExpiryMinutes;
+            var expires = DateTime.UtcNow.AddMinutes(expiryMinutes);
+
             var token = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+                expires: expires,
                 signingCredentials: creds);
 
             return await Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
