@@ -1,4 +1,4 @@
-namespace Template.API.Settings
+namespace Template.Application.Common.Settings
 {
     /// <summary>
     /// Configuration options for caching behavior

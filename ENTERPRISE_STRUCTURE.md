@@ -54,8 +54,6 @@ src/
 │   │   └── (Custom middleware components)
 │   ├── Services/
 │   │   └── ValidationService.cs
-│   ├── Settings/
-│   │   └── CacheSettings.cs
 │   ├── Properties/
 │   │   └── launchSettings.json
 │   ├── Program.cs
@@ -119,30 +117,45 @@ src/
 │   │   ├── Services/
 │   │   │   ├── NotificationService.cs
 │   │   │   ├── AuthService.cs
+│   │   └── Settings/
+│   │       ├── JwtSettings.cs      # JWT business rules
+│   │       ├── EmailSettings.cs    # Email business rules
+│   │       └── CacheSettings.cs    # Cache business policie
 │   └── DependencyInjection.cs
 │
 ├── Template.Infrastructure/
+│   ├── Configuration/
+│   │   ├── DatabaseConfiguration.cs    # EF Core setup
+│   │   ├── EmailConfiguration.cs       # SMTP/SendGrid setup
+│   │   └── CacheConfiguration.cs       # Redis/Memory cache setup
 │   ├── Data/
 │   │   ├── Contexts/
 │   │   │   ├── AppDbContext.cs
 │   │   │   └── IdentityDbContext.cs
-│   │   ├── Configurations/
-│   │   │   ├── DoctorConfiguration.cs
-│   │   │   ├── PatientConfiguration.cs
-│   │   │   └── ... (one per entity)
 │   │   ├── Repositories/
 │   │   │   ├── GenericRepository.cs
 │   │   │   ├── DoctorRepository.cs
-│   │   │   ├── PatientRepository.cs
-│   │   │   └── UnitOfWork.cs
+│   │   │   └── PatientRepository.cs
+│   │   ├── UnitOfWork.cs
 │   │   └── Seed/
 │   │       ├── DbSeeder.cs
 │   │       └── Configuration/
+│   │           ├── DefaultUsersAndRolesOptions.cs
+│   │           └── UserSeedOptions.cs
 │   ├── Services/
+│   │   ├── CurrentUserService.cs
 │   │   ├── DateTimeService.cs
-│   │   ├── EmailService.cs
 │   │   └── TokenService.cs
-│   └── DependencyInjection.cs
+│   ├── Migrations/
+│   │   ├── 20250819195941_InitialCreate.cs
+│   │   ├── 20250819195941_InitialCreate.Designer.cs
+│   │   ├── IdentityDbContextModelSnapshot.cs
+│   │   └── AppDb/
+│   │       ├── 20250822070251_CreateAppDbSchema.cs
+│   │       ├── 20250822070251_CreateAppDbSchema.Designer.cs
+│   │       └── AppDbContextModelSnapshot.cs
+│   ├── DependencyInjection.cs
+│   └── Template.Infrastructure.csproj
 │
 └── Template.Domain/
     ├── Common/

@@ -29,7 +29,7 @@ namespace Template.API.Common.Filters
                     Errors = new List<string> { notFoundEx.Message }
                 },
                 ValidationException validationEx => new ApiResponse(validationEx.Errors.Select(e => e).ToList()),
-                ForbiddenAccessException forbiddenEx => new ApiResponse(forbiddenEx.Message)
+                ForbiddenException forbiddenEx => new ApiResponse(forbiddenEx.Message)
                 {
                     Success = false,
                     Errors = new List<string> { forbiddenEx.Message }
@@ -45,7 +45,7 @@ namespace Template.API.Common.Filters
             {
                 NotFoundException => StatusCodes.Status404NotFound,
                 ValidationException => StatusCodes.Status400BadRequest,
-                ForbiddenAccessException => StatusCodes.Status403Forbidden,
+                ForbiddenException => StatusCodes.Status403Forbidden,
                 _ => StatusCodes.Status500InternalServerError
             };
 

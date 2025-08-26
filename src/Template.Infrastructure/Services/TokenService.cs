@@ -3,8 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Template.Application.Common;
 using Template.Application.Common.Interfaces;
+using Template.Application.Common.Settings;
 using Template.Domain.Identity;
 
 namespace Template.Infrastructure.Services
@@ -18,14 +18,17 @@ namespace Template.Infrastructure.Services
             _jwtSettings = jwtOptions.Value;
         }
 
-        public async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
+        public async Task<string> GenerateTokenAsync(string userId, string email, IEnumerable<string> roles)
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+                new Claim(JwtRegisteredClaimNames.Sub, userId),
+                new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            // Add role claims
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -40,9 +43,35 @@ namespace Template.Infrastructure.Services
             return await Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
         }
 
-        public string GenerateRefreshToken()
+        public async Task<string> GenerateRefreshTokenAsync()
         {
-            return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            return await Task.FromResult(Convert.ToBase64String(Guid.NewGuid().ToByteArray()));
+        }
+
+        public async Task<bool> ValidateTokenAsync(string token)
+        {
+            try
+            {
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = true,
+                    ValidateIssuer = true,
+                    ValidIssuer = _jwtSettings.Issuer,
+                    ValidAudience = _jwtSettings.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+                return await Task.FromResult(true);
+            }
+            catch
+            {
+                return await Task.FromResult(false);
+            }
         }
 
         public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
@@ -59,7 +88,20 @@ namespace Template.Infrastructure.Services
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+            try
+            {
+                return tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Legacy method for backward compatibility
+        public async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
+        {
+            return await GenerateTokenAsync(user.Id, user.Email ?? "", new List<string>());
         }
     }
 }

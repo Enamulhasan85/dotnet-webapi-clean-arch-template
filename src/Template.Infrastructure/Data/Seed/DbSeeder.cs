@@ -81,7 +81,6 @@ namespace Template.Infrastructure.Data.Seed
                         Email = userSeedOptions.Email,
                         FullName = userSeedOptions.FullName,
                         EmailConfirmed = true,
-                        CreatedAt = DateTime.UtcNow,
                         IsActive = true
                     };
 

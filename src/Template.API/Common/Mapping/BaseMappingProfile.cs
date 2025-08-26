@@ -1,6 +1,6 @@
 using AutoMapper;
 using Template.API.Models.Common;
-using Template.Application.DTOs;
+using Template.Application.Common.Models;
 
 namespace Template.API.Common.Mapping
 {

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Template.Application.Common;
+using Template.Application.Common.Settings;
 
 namespace Template.API.Extensions
 {
@@ -70,17 +71,18 @@ namespace Template.API.Extensions
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
+            // Configure cache options
+            services.Configure<CacheOptions>(
+                configuration.GetSection("CacheSettings"));
+
             // Add Memory Cache support with size limits
             services.AddMemoryCache(options =>
             {
-                var cacheSection = configuration.GetSection("CacheSettings");
-                var maxCacheSize = cacheSection.GetValue<int?>("MaxCacheSize") ?? 1000;
+                var cacheSection = configuration.GetSection("CacheSettings").Get<CacheOptions>()!;
+                var maxCacheSize = cacheSection.MaxCacheSize;
                 options.SizeLimit = maxCacheSize;
             });
 
-            // Configure cache options
-            services.Configure<Template.API.Settings.CacheOptions>(
-                configuration.GetSection("CacheSettings"));
 
             // Register custom services
             services.AddScoped<Template.API.Services.IValidationService, Template.API.Services.ValidationService>();

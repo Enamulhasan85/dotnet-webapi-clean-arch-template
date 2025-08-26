@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Template.API.Settings;
+using Template.Application.Common.Settings;
 
 namespace Template.API.Common.Attributes
 {
