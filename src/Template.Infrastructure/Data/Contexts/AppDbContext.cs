@@ -9,6 +9,17 @@ namespace Template.Infrastructure.Data.Contexts
 
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
         // Add more DbSets as needed
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Apply only App-specific entity configurations
+            modelBuilder.ApplyConfiguration(new Configurations.UserProfileConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.PatientConfiguration());
+            modelBuilder.ApplyConfiguration(new Configurations.DoctorConfiguration());
+        }
     }
 }

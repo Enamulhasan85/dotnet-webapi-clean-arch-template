@@ -16,8 +16,8 @@ namespace Template.Infrastructure.Data.Contexts
         {
             base.OnModelCreating(builder);
 
-            // Apply additional entity configurations if you have any
-            builder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
+            // Only apply Identity-specific configurations here
+            // Don't apply all configurations from assembly
         }
     }
 }

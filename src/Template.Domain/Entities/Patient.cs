@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Template.Domain.Common;
 using Template.Domain.Enums;
 using Template.Domain.ValueObjects;
@@ -10,8 +11,15 @@ public class Patient : AuditableEntity<int>
     public UserProfile? UserProfile { get; set; }
 
     public PatientStatus Status { get; set; } = PatientStatus.Active;
+
+    [MaxLength(50)]
+    [Required]
     public string? MedicalRecordNumber { get; set; }
+
+    [MaxLength(200)]
     public string? EmergencyContact { get; set; }
+
+    [MaxLength(10)]
     public string? BloodType { get; set; }
 
     public void UpdateStatus(PatientStatus newStatus)

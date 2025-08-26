@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Template.Domain.Common;
 using Template.Domain.Enums;
 using Template.Domain.ValueObjects;
@@ -6,14 +7,26 @@ namespace Template.Domain.Entities;
 
 public class UserProfile : AuditableEntity<int>
 {
+    [Required]
+    [MaxLength(450)]
     public string ApplicationUserId { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(100)]
     public string FirstName { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(100)]
     public string LastName { get; set; } = string.Empty;
+
     public Email? Email { get; set; }
     public PhoneNumber? PhoneNumber { get; set; }
     public Address? Address { get; set; }
     public DateTime? DateOfBirth { get; set; }
+
+    [MaxLength(500)]
     public string? ProfilePictureUrl { get; set; }
+
     public bool IsActive { get; set; } = true;
 
     public string FullName => $"{FirstName} {LastName}".Trim();
