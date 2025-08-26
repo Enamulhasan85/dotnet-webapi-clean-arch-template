@@ -26,7 +26,6 @@ namespace Template.API
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
