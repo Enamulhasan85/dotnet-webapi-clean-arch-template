@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.API.Common.Extensions;
@@ -12,10 +13,14 @@ using Template.Application.Features.Authentication.Commands;
 using Template.Application.Features.Authentication.DTOs;
 using Template.Application.Features.Authentication.Queries;
 
-namespace Template.Api.Controllers
+namespace Template.API.Controllers.V1
 {
+    /// <summary>
+    /// V1 Authentication Controller - Core authentication functionality
+    /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     public class AuthController : BaseController
     {

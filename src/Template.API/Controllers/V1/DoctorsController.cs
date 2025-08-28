@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Template.API.Common.Attributes;
@@ -12,10 +13,14 @@ using Template.Application.Features.Doctors.DTOs;
 using Template.Application.Features.Doctors.Services;
 using Template.Domain.Enums;
 
-namespace Template.API.Controllers
+namespace Template.API.Controllers.V1
 {
+    /// <summary>
+    /// V1 Doctors Controller - Core functionality
+    /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     public class DoctorsController : BaseController
     {

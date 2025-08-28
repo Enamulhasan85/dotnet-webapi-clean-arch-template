@@ -10,16 +10,24 @@ namespace Template.API.Extensions
     public static class SwaggerExtensions
     {
         /// <summary>
-        /// Adds Swagger services with enhanced configuration
+        /// Adds Swagger services with enhanced configuration and API versioning support
         /// </summary>
         public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
         {
             services.AddSwaggerGen(c =>
             {
+                // Configure Swagger for multiple API versions
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Template API",
                     Version = "v1",
+                    Description = "A Clean Architecture API Template with comprehensive features"
+                });
+
+                c.SwaggerDoc("v2", new OpenApiInfo
+                {
+                    Title = "Template API",
+                    Version = "v2",
                     Description = "A Clean Architecture API Template with comprehensive features"
                 });
 
@@ -69,14 +77,17 @@ namespace Template.API.Extensions
         }
 
         /// <summary>
-        /// Configures Swagger UI with enhanced settings
+        /// Configures Swagger UI with enhanced settings and API versioning support
         /// </summary>
         public static IApplicationBuilder UseSwaggerUI(this IApplicationBuilder app)
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Template API v1");
+                // Add endpoints for each API version
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Template API V1");
+                c.SwaggerEndpoint("/swagger/v2/swagger.json", "Template API V2");
+
                 c.RoutePrefix = "swagger";
                 c.DocumentTitle = "Template API Documentation";
                 c.DefaultModelsExpandDepth(-1);

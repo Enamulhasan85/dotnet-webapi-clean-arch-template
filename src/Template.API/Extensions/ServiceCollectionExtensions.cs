@@ -1,10 +1,12 @@
 ﻿using System.Reflection;
 using System.Text;
+using Asp.Versioning;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Template.API.Common.Extensions;
 using Template.Application.Common.Settings;
 
 namespace Template.API.Extensions
@@ -31,6 +33,9 @@ namespace Template.API.Extensions
 
             // Add Controllers with global filters (API responsibility)
             services.AddApiControllers();
+
+            // Add API Versioning (API responsibility)
+            services.AddCustomApiVersioning();
 
             // Add FluentValidation (API responsibility)
             services.AddApiValidation();
