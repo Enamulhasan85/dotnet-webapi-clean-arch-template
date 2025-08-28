@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Template.API.Models
@@ -13,6 +14,7 @@ namespace Template.API.Models
         [Required(ErrorMessage = "Full name is required")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Full name must be between 2 and 100 characters")]
         [RegularExpression(@"^[a-zA-Z0-9\s\-'\.]+$", ErrorMessage = "Full name can only contain letters, numbers, spaces, hyphens, apostrophes, and periods")]
+        [DefaultValue("John Doe")]
         public required string FullName { get; set; }
 
         /// <summary>
