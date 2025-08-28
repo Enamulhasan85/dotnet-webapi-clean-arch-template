@@ -50,8 +50,9 @@ src/
 │   │   └── Models/
 │   │       └── (Common model definitions)
 │   ├── Extensions/
-│   │   ├── ServiceCollectionExtensions.cs
 │   │   ├── DatabaseSeederExtensions.cs
+│   │   ├── RateLimitingExtensions.cs  
+│   │   ├── ServiceCollectionExtensions.cs
 │   │   └── SwaggerExtensions.cs
 │   ├── Middleware/
 │   │   └── (Custom middleware components)
@@ -124,6 +125,7 @@ src/
 │   │       ├── JwtSettings.cs           # JWT business rules
 │   │       ├── EmailSettings.cs         # Email business rules
 │   │       ├── CacheSettings.cs         # Cache business policies
+│   │       ├── RateLimitSettings.cs     # Rate limiting configuration
 │   │       ├── DefaultUsersAndRolesOptions.cs  # Default users and roles configuration
 │   │       └── UserSeedOptions.cs       # User seed configuration options
 │   └── DependencyInjection.cs

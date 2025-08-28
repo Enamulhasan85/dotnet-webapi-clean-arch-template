@@ -31,6 +31,9 @@ namespace Template.API.Extensions
             services.AddApiAuthentication(configuration);
             services.AddAuthorization();
 
+            // Add Rate Limiting (API responsibility)
+            services.AddRateLimiting(configuration);
+
             // Add Controllers with global filters (API responsibility)
             services.AddApiControllers();
 

@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Template.API.Common.Attributes;
 using Template.API.Common.Extensions;
 using Template.API.Controllers.Common;
@@ -41,8 +42,10 @@ namespace Template.API.Controllers.V1
         /// <returns>Paginated list of doctors</returns>
         [HttpGet]
         [Cache]
+        [EnableRateLimiting("Api")]
         [ProducesResponseType(typeof(ApiResponse<PaginatedResult<DoctorResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status429TooManyRequests)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {

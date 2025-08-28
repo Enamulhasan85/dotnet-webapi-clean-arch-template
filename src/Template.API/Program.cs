@@ -33,6 +33,8 @@ namespace Template.API
 
             app.UseExceptionHandler("/error");
 
+            app.UseRateLimiter();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

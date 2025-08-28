@@ -2,6 +2,8 @@ using System.Security.Claims;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Template.API.Common.Attributes;
 using Template.API.Common.Extensions;
 using Template.API.Controllers.Common;
 using Template.API.Models;
@@ -39,9 +41,11 @@ namespace Template.API.Controllers.V1
         /// <param name="model">User registration details</param>
         /// <returns>Registration result</returns>
         [HttpPost("register")]
+        [EnableRateLimiting("Authentication")]
         [ProducesResponseType(typeof(ApiResponse<RegisterResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status429TooManyRequests)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
@@ -83,9 +87,11 @@ namespace Template.API.Controllers.V1
         /// <param name="model">User login credentials</param>
         /// <returns>Authentication result with JWT token</returns>
         [HttpPost("login")]
+        [EnableRateLimiting("Authentication")]
         [ProducesResponseType(typeof(ApiResponse<LoginResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status429TooManyRequests)]
         public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
             if (!ModelState.IsValid)
@@ -135,9 +141,11 @@ namespace Template.API.Controllers.V1
         /// <returns>User profile information</returns>
         [Authorize]
         [HttpGet("me")]
+        [EnableRateLimiting("PerUser")]
         [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status429TooManyRequests)]
         public async Task<IActionResult> GetProfile()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
