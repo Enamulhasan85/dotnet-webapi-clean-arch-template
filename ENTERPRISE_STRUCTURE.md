@@ -8,12 +8,15 @@ For applications with 10-20+ entities, here's the recommended **Feature-Based Ar
 src/
 ├── Template.API/
 │   ├── Controllers/
-│   │   ├── AuthController.cs
-│   │   ├── DoctorsController.cs
-│   │   ├── PatientsController.cs
-│   │   ├── ErrorController.cs
-│   │   └── Common/
-│   │       └── BaseController.cs
+│   │   ├── Common/
+│   │   │   └── BaseController.cs
+│   │   │── V1/
+│   │   │   ├── AuthController.cs
+│   │   │   ├── DoctorsController.cs
+│   │   │   └── PatientsController.cs
+│   │   ├── V2/
+│   │   │   └── (new controllers for V2)
+│   │   ├── ErrorController.cs   
 │   ├── Models/
 │   │   ├── Auth/
 │   │   │   ├── LoginRequest.cs
