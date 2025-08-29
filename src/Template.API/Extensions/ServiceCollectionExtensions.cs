@@ -34,6 +34,9 @@ namespace Template.API.Extensions
             // Add Rate Limiting (API responsibility)
             services.AddRateLimiting(configuration);
 
+            // Add Response Compression (API responsibility)
+            services.AddResponseCompression();
+
             // Add Controllers with global filters (API responsibility)
             services.AddApiControllers();
 

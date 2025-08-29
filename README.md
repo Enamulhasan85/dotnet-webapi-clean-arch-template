@@ -14,6 +14,8 @@ An enterprise-ready Clean Architecture .NET Web API template with comprehensive 
 ✅ **AutoMapper** - Object-to-object mapping  
 ✅ **FluentValidation** - Robust input validation  
 ✅ **CORS Support** - Cross-origin resource sharing  
+✅ **Rate Limiting** - Request throttling with multiple policies  
+✅ **Response Compression** - Gzip and Brotli compression  
 
 ## 🚀 Enhanced Features
 

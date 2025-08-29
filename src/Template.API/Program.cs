@@ -31,6 +31,8 @@ namespace Template.API
 
             app.UseHttpsRedirection();
 
+            app.UseResponseCompression();
+
             app.UseExceptionHandler("/error");
 
             app.UseRateLimiter();
